@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ZincObserve
+metadata:
+  name: zo1
+  namespace: zo1 # Optional. Will be created if not specified or does not exist
+spec:
+  k8s: eks # Mandatory. Currently only eks is supported. eks, gke, etc
+  storage: s3 # Optional. Platform specific will be used if not specified
+  selector:
+    app: myapp
+  ports:
+  - port: <Port>
+    targetPort: <Target Port>
