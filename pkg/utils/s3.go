@@ -10,7 +10,7 @@ import (
 
 // create an s3 bucket
 func CreateS3Bucket(bucketName string) error {
-	fmt.Println("..............CreateS3Bucket............")
+	fmt.Println("..............Create S3 Bucket............")
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("us-west-2"),
 	})
@@ -33,6 +33,8 @@ func CreateS3Bucket(bucketName string) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Bucket created: ", bucketName)
 
 	return nil
 }

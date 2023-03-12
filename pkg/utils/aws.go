@@ -7,8 +7,8 @@ import (
 )
 
 func SetupAWS(clusterName, releaseName, region string) {
-	fmt.Println("..............SetupAWS............")
-	exists, err := HasOIDCProvider(clusterName)
+	fmt.Println("..............Starting AWS Setup............")
+	exists, err := HasOIDCProvider(clusterName, region)
 	if err != nil {
 		fmt.Println("error: ", err)
 		panic(err)
@@ -41,7 +41,7 @@ func SetupAWS(clusterName, releaseName, region string) {
 
 	// create an IAM role
 	roleName := "zinc-observe-" + clusterName + "-" + releaseName
-	err = CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName)
+	err = CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
 	if err != nil {
 		panic(err)
 	}

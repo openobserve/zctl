@@ -57,8 +57,8 @@ func GetAWSAccountID() (string, error) {
 }
 
 // create IAM role with EKS trusted entity
-func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterName, releaseName string) error {
-	fmt.Println("..............CreateIAMRole............")
+func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterName, releaseName, bucketName string) error {
+	fmt.Println("..............Create IAM Role............")
 	// Load the AWS configuration
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
@@ -90,10 +90,15 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 	// Create the role
 	roleResp, err := svc.CreateRole(context.Background(), input)
 	if err != nil {
+		fmt.Println("Error in CreateRole: ", err.Error())
 		return err
 	}
 
-	bucketName := "zinc-observe-" + clusterName + "-" + releaseName
+	fmt.Println("Created IAM role: ", roleName)
+
+	fmt.Println("..............Create IAM Role Policy............")
+
+	// bucketName := "zinc-observe-" + clusterName + "-" + releaseName
 
 	policyDocument := GetS3PolicyDocument(bucketName)
 
@@ -104,10 +109,11 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 		RoleName:       roleResp.Role.RoleName,
 	})
 	if err != nil {
+		fmt.Println("Error in PutRolePolicy: ", err.Error())
 		return err
 	}
 
-	fmt.Printf("Created IAM role %s\n", roleName)
+	fmt.Printf("Policy created for IAM role %s\n", roleName)
 	return nil
 }
 
