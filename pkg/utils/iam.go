@@ -1,0 +1,173 @@
+package utils
+
+import (
+	"fmt"
+
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+)
+
+func GetS3PolicyDocument(bucketName string) string {
+	fmt.Println("..............GetS3PolicyDocument............")
+	return fmt.Sprintf(`{
+		"Version": "2012-10-17",
+		"Statement": [
+			{
+				"Effect": "Allow",
+				"Action": [
+					"s3:PutObject",
+					"s3:GetObject",
+					"s3:ListBucket",
+					"s3:DeleteObject"
+				],
+				"Resource": [
+					"arn:aws:s3:::%s/*"
+				]
+			}
+		]
+	}`, bucketName)
+}
+
+// get AWS account number
+func GetAWSAccountID() (string, error) {
+	fmt.Println("..............GetAWSAccountID............")
+	// Load the AWS configuration
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	// Create a new STS client
+	svc := sts.NewFromConfig(cfg)
+
+	// Call the GetCallerIdentity API to retrieve the account number
+	resp, err := svc.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
+	if err != nil {
+		return "", err
+	}
+
+	// Extract the account number from the response
+	accountID := aws.ToString(resp.Account)
+
+	return accountID, nil
+}
+
+// create IAM role with EKS trusted entity
+func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterName, releaseName string) error {
+	fmt.Println("..............CreateIAMRole............")
+	// Load the AWS configuration
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return err
+	}
+
+	// Create a new IAM client
+	svc := iam.NewFromConfig(cfg)
+
+	trustedEntity := fmt.Sprintf(`{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Principal": {
+				"Federated": "arn:aws:iam::%s:oidc-provider/oidc.eks.%s.amazonaws.com/id/%s"
+			},
+			"Action": "sts:AssumeRoleWithWebIdentity"
+		}
+	]
+}`, accountId, region, issuerId)
+
+	// Create the role input
+	input := &iam.CreateRoleInput{
+		RoleName:                 aws.String(roleName),
+		AssumeRolePolicyDocument: aws.String(trustedEntity),
+	}
+
+	// Create the role
+	roleResp, err := svc.CreateRole(context.Background(), input)
+	if err != nil {
+		return err
+	}
+
+	bucketName := "zinc-observe-" + clusterName + "-" + releaseName
+
+	policyDocument := GetS3PolicyDocument(bucketName)
+
+	// Attach the policy to the role
+	_, err = svc.PutRolePolicy(context.Background(), &iam.PutRolePolicyInput{
+		PolicyName:     aws.String(policyName),
+		PolicyDocument: aws.String(policyDocument),
+		RoleName:       roleResp.Role.RoleName,
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Created IAM role %s\n", roleName)
+	return nil
+}
+
+func DeleteIAMRoleWithPolicies(roleName string) error {
+	fmt.Println("..............DeleteIAMRoleWithPolicies............")
+	// Load the AWS configuration
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return err
+	}
+
+	// Create a new IAM client
+	svc := iam.NewFromConfig(cfg)
+
+	err = deleteInlineRolePolicies(roleName)
+	if err != nil {
+		return err
+	}
+
+	// Delete the role
+	_, err = svc.DeleteRole(context.Background(), &iam.DeleteRoleInput{
+		RoleName: aws.String(roleName),
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Deleted IAM role %s\n", roleName)
+	return nil
+}
+
+func deleteInlineRolePolicies(roleName string) error {
+	// Load the AWS SDK config
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return err
+	}
+
+	// Create a new IAM client
+	svc := iam.NewFromConfig(cfg)
+
+	// List the inline policies attached to the role
+	resp, err := svc.ListRolePolicies(context.TODO(), &iam.ListRolePoliciesInput{
+		RoleName: &roleName,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Delete each inline policy attached to the role
+	for _, policyName := range resp.PolicyNames {
+		_, err := svc.DeleteRolePolicy(context.TODO(), &iam.DeleteRolePolicyInput{
+			RoleName:   &roleName,
+			PolicyName: aws.String(policyName),
+		})
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Deleted inline policy %s from role %s\n", policyName, roleName)
+	}
+
+	return nil
+}
