@@ -20,28 +20,26 @@ func main() {
 
 }
 
-func setupAWS(releaseName string) error {
+func setupAWS(releaseName string) (string, error) {
 	clusterName, err := utils.GetCurrentEKSClusterName()
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 	fmt.Println("EKS cluster name:", clusterName)
-
-	// cluster := "dev2"
 
 	region, err := utils.GetDefaultAwsRegion()
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 
-	err = utils.SetupAWS(clusterName, releaseName, region)
+	roleArn, err := utils.SetupAWS(clusterName, releaseName, region)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return roleArn, nil
 }
 
 // Create AWS IAM Role and Policy

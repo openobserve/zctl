@@ -57,12 +57,12 @@ func GetAWSAccountID() (string, error) {
 }
 
 // create IAM role with EKS trusted entity
-func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterName, releaseName, bucketName string) error {
+func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterName, releaseName, bucketName string) (string, error) {
 	fmt.Println("..............Create IAM Role............")
 	// Load the AWS configuration
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Create a new IAM client
@@ -91,10 +91,10 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 	roleResp, err := svc.CreateRole(context.Background(), input)
 	if err != nil {
 		fmt.Println("Error in CreateRole: ", err.Error())
-		return err
+		return "", err
 	}
 
-	fmt.Println("Created IAM role: ", roleName)
+	fmt.Println("Created IAM role: ", roleResp.Role.Arn)
 
 	fmt.Println("..............Create IAM Role Policy............")
 
@@ -110,11 +110,11 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 	})
 	if err != nil {
 		fmt.Println("Error in PutRolePolicy: ", err.Error())
-		return err
+		return "", err
 	}
 
 	fmt.Printf("Policy created for IAM role %s\n", roleName)
-	return nil
+	return *roleResp.Role.Arn, nil
 }
 
 func DeleteIAMRoleWithPolicies(roleName string) error {

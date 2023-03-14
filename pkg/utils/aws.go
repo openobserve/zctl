@@ -8,12 +8,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 )
 
-func SetupAWS(clusterName, releaseName, region string) error {
+// SetupAWS creates an S3 bucket, IAM role and inline policy for the role. It returns the ARN of the role.
+func SetupAWS(clusterName, releaseName, region string) (string, error) {
 	fmt.Println("..............Starting AWS Setup............")
 	exists, err := HasOIDCProvider(clusterName, region)
 	if err != nil {
 		fmt.Println("error: ", err)
-		return err
+		return "", err
 	}
 
 	clusterDetails := &types.Cluster{}
@@ -21,7 +22,7 @@ func SetupAWS(clusterName, releaseName, region string) error {
 		// Get EKS cluster details
 		clusterDetails, err = GetEKSClusterDetails(clusterName)
 		if err != nil {
-			return err
+			return "", err
 		}
 		// print(clusterDetails)
 	}
@@ -31,24 +32,24 @@ func SetupAWS(clusterName, releaseName, region string) error {
 	issuerId := issuer[len(issuer)-32:]
 	awsAccountId, err := GetAWSAccountID()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// create an s3 bucket
 	bucketName := "zinc-observe-" + clusterName + "-" + releaseName
 	err = CreateS3Bucket(bucketName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// create an IAM role
 	roleName := "zinc-observe-" + clusterName + "-" + releaseName
-	err = CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
+	roleArn, err := CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return roleArn, nil
 }
 
 func TearDownAWS(clusterName, releaseName string) {
