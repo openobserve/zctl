@@ -1,196 +1,88 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-	"net/url"
-	"os"
-	"strings"
-	"time"
 
 	"gopkg.in/yaml.v2"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/getter"
-	"helm.sh/helm/v3/pkg/postrender"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/repo"
-	"helm.sh/helm/v3/pkg/strvals"
 )
 
-type Helm struct {
-	AppVersion    string
-	ChartName     string
-	ChartVersion  string
-	Namespace     string
-	PostRenderer  postrender.PostRenderer
-	ReleaseName   string
-	RepositoryURL string
-	Wait          bool
+func InstallUsingHelm(releaseName string) {
+	fmt.Println("install called")
 
-	SetValues  []string
-	ValuesFile string
-}
-
-func initialize(kubeContext, namespace string) (*action.Configuration, error) {
-	// Hack to work around https://github.com/helm/helm/issues/7430
-	_ = os.Setenv("HELM_KUBECONTEXT", kubeContext)
-	_ = os.Setenv("HELM_NAMESPACE", namespace)
-	settings := cli.New()
-
-	// Initialize the action configuration
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, "secret", log.Printf); err != nil {
-		return nil, fmt.Errorf("failed to initialize helm action config: %w", err)
-	}
-	return actionConfig, nil
-}
-
-func (h *Helm) DownloadChart() (*chart.Chart, error) {
-	getters := getter.All(&cli.EnvSettings{})
-
-	u, err := url.Parse(h.RepositoryURL)
+	// Retrieve the URL of the Kubernetes cluster currently in use.
+	clusterURL, err := GetCurrentKubeContextAPIEndpoint()
 	if err != nil {
-		return nil, err
+		// Print an error message if an error occurs while retrieving the cluster URL.
+		fmt.Println("error: ", err)
+		return
 	}
 
-	var chartPath string
-	if u.Scheme == "oci" {
-		chartPath = h.RepositoryURL + ":" + h.ChartVersion
-	} else {
-		// Find Chart
-		chartPath, err = repo.FindChartInRepoURL(h.RepositoryURL, h.ChartName, h.ChartVersion, "", "", "", getters)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	fmt.Printf("Downloading Chart: %s\n", chartPath)
-	g, err := getters.ByScheme(u.Scheme)
+	// Retrieve the context of the Kubernetes cluster using its URL.
+	context, err := KubeContextForCluster(clusterURL)
 	if err != nil {
-		return nil, err
+		// Print an error message if an error occurs while retrieving the context.
+		fmt.Println("error: ", err)
 	}
 
-	// Download chart archive into memory
-	data, err := g.Get(chartPath)
+	// Set up the required AWS resources for the application using a predefined setup function.
+	bucket, roleArn, err := SetupAWS(releaseName)
 	if err != nil {
-		if strings.HasPrefix(h.RepositoryURL, "oci://public.ecr.aws") {
-			msg := "Please review: https://docs.aws.amazon.com/AmazonECR/latest/public/public-troubleshooting.html"
-			err = fmt.Errorf("%w\n%s", err, msg)
-		}
-		return nil, err
+		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
+		fmt.Println("error: ", err)
+		panic(err)
 	}
 
-	// Decompress the archive
-	files, err := loader.LoadArchiveFiles(data)
+	// Create a new Helm object with the required deployment parameters.
+	h1 := Helm{
+		AppVersion:    "0.2.3",
+		ChartName:     "zincobserve",
+		ChartVersion:  "0.2.3",
+		Namespace:     "t2",
+		ReleaseName:   releaseName,
+		RepositoryURL: "https://charts.zinc.dev",
+	}
+
+	// Download the Helm chart specified by the Helm object.
+	chart, err := h1.DownloadChart()
 	if err != nil {
-		return nil, err
+		// Print an error message if an error occurs while downloading the chart.
+		fmt.Println("error downloading: ", err)
 	}
 
-	// Load the chart
-	chart, err := loader.LoadFiles(files)
+	// Marshal the values of the Helm chart to JSON format.
+	jsonData, err := json.Marshal(chart.Values)
 	if err != nil {
-		return nil, err
-	}
-	return chart, nil
-}
-
-func (h *Helm) Install(chart *chart.Chart, kubeContext string) error {
-	// Parse the values file
-	values := map[string]interface{}{}
-	if err := yaml.Unmarshal([]byte(h.ValuesFile), &values); err != nil {
-		return fmt.Errorf("failed to parse values file: %w", err)
+		// Print an error message if an error occurs while marshaling the values to JSON.
+		fmt.Println("Error:", err)
+		return
 	}
 
-	for _, v := range h.SetValues {
-		if err := strvals.ParseInto(v, values); err != nil {
-			return fmt.Errorf("failed parsing --set data: %w", err)
-		}
-	}
+	// Declare a variable to store the unmarshaled values from the Helm chart.
+	var data ZincObserveValues
 
-	actionConfig, err := initialize(kubeContext, h.Namespace)
+	// Unmarshal the values from JSON format and store them in the declared variable.
+	err = yaml.Unmarshal(jsonData, &data)
 	if err != nil {
-		return err
+		// Print an error message if an error occurs while unmarshaling the values from JSON.
+		fmt.Println("error unmarshalling: ", err)
 	}
 
-	// Configure the install options
-	instAction := action.NewInstall(actionConfig)
-	instAction.Namespace = h.Namespace
-	instAction.ReleaseName = h.ReleaseName
-	instAction.CreateNamespace = true
-	instAction.IsUpgrade = true
-	instAction.PostRenderer = h.PostRenderer
-	instAction.Wait = h.Wait
-	instAction.Timeout = 300 * time.Second
-	chart.Metadata.AppVersion = h.AppVersion
+	// Print a value from the unmarshaled data for testing purposes.
+	fmt.Println(data.Auth.ZO_ROOT_USER_EMAIL)
 
-	// Install the chart
-	fmt.Println("Helm installing...")
-	rel, err := instAction.Run(chart, values)
+	// Update the Helm chart values with the AWS bucket name and role ARN.
+	data.Config.ZOS3BUCKETNAME = bucket
+	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
+
+	// Convert the updated Helm chart values to a map and set them to the chart object.
+	chart.Values = StructToMap(data)
+
+	// Install the Helm chart with the updated values on the specified Kubernetes cluster context.
+	err = h1.Install(chart, context)
 	if err != nil {
-		return fmt.Errorf("helm install failed: %s", err)
+		// Print an error message if an error occurs while installing the Helm chart.
+		fmt.Println("error installing: ", err)
 	}
 
-	fmt.Printf("Using chart version %q, installed %q version %q in namespace %q\n",
-		rel.Chart.Metadata.Version, rel.Name, rel.Chart.Metadata.AppVersion, rel.Namespace)
-
-	// Print the Chart NOTES
-	if len(rel.Info.Notes) > 0 {
-		fmt.Printf("NOTES:\n%s\n", strings.TrimSpace(rel.Info.Notes))
-	}
-
-	return nil
-}
-
-func List(kubeContext string) ([]*release.Release, error) {
-	actionConfig, err := initialize(kubeContext, "")
-	if err != nil {
-		return nil, err
-	}
-
-	client := action.NewList(actionConfig)
-	client.AllNamespaces = true
-
-	releases, err := client.Run()
-	if (err) != nil {
-		return nil, err
-	}
-
-	return releases, nil
-}
-
-func Status(kubeContext, releaseName, namespace string) (string, error) {
-	actionConfig, err := initialize(kubeContext, namespace)
-	if err != nil {
-		return "", err
-	}
-	status := action.NewStatus(actionConfig)
-
-	rel, err := status.Run(releaseName)
-	if (err) != nil {
-		return "", err
-	}
-
-	// strip chart metadata from the output
-	rel.Chart = nil
-
-	return "", nil
-}
-
-func Uninstall(kubeContext, releaseName, namespace string) error {
-	actionConfig, err := initialize(kubeContext, namespace)
-	if err != nil {
-		return err
-	}
-	uninstall := action.NewUninstall(actionConfig)
-
-	// Uninstall the chart
-	_, err = uninstall.Run(releaseName)
-	if err != nil {
-		return fmt.Errorf("failed uninstalling chart: %w", err)
-	}
-
-	return nil
 }

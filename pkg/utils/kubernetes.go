@@ -42,19 +42,6 @@ func Client(context string) (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(restConfig)
 }
 
-func ClusterURLForCurrentContext() string {
-	raw, err := Kubeconfig()
-	if err != nil {
-		return ""
-	}
-
-	if err := clientcmdapi.MinifyConfig(raw); err != nil {
-		return ""
-	}
-
-	return raw.Clusters[raw.Contexts[raw.CurrentContext].Cluster].Server
-}
-
 func DynamicClient(context string) (dynamic.Interface, error) {
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
@@ -104,6 +91,19 @@ func Kubeconfig() (*clientcmdapi.Config, error) {
 
 	return &raw, nil
 }
+
+// func ClusterURLForCurrentContext() string {
+// 	raw, err := Kubeconfig()
+// 	if err != nil {
+// 		return ""
+// 	}
+
+// 	if err := clientcmdapi.MinifyConfig(raw); err != nil {
+// 		return ""
+// 	}
+
+// 	return raw.Clusters[raw.Contexts[raw.CurrentContext].Cluster].Server
+// }
 
 func GetCurrentKubeContextAPIEndpoint() (string, error) {
 	// Use the default kubeconfig file to create a Config object.
