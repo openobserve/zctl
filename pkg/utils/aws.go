@@ -1,17 +1,19 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 )
 
-func SetupAWS(clusterName, releaseName, region string) {
+func SetupAWS(clusterName, releaseName, region string) error {
 	fmt.Println("..............Starting AWS Setup............")
 	exists, err := HasOIDCProvider(clusterName, region)
 	if err != nil {
 		fmt.Println("error: ", err)
-		panic(err)
+		return err
 	}
 
 	clusterDetails := &types.Cluster{}
@@ -19,7 +21,7 @@ func SetupAWS(clusterName, releaseName, region string) {
 		// Get EKS cluster details
 		clusterDetails, err = GetEKSClusterDetails(clusterName)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		// print(clusterDetails)
 	}
@@ -29,22 +31,24 @@ func SetupAWS(clusterName, releaseName, region string) {
 	issuerId := issuer[len(issuer)-32:]
 	awsAccountId, err := GetAWSAccountID()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// create an s3 bucket
 	bucketName := "zinc-observe-" + clusterName + "-" + releaseName
 	err = CreateS3Bucket(bucketName)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// create an IAM role
 	roleName := "zinc-observe-" + clusterName + "-" + releaseName
 	err = CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 func TearDownAWS(clusterName, releaseName string) {
@@ -64,4 +68,17 @@ func TearDownAWS(clusterName, releaseName string) {
 		panic(err)
 	}
 
+}
+
+func GetDefaultAwsRegion() (string, error) {
+	// Load the AWS configuration
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	// Get the default region
+	region := cfg.Region
+
+	return region, nil
 }
