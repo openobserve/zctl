@@ -104,3 +104,19 @@ func Kubeconfig() (*clientcmdapi.Config, error) {
 
 	return &raw, nil
 }
+
+func GetCurrentKubeContextAPIEndpoint() (string, error) {
+	// Use the default kubeconfig file to create a Config object.
+	kubeconfig, err := clientcmd.LoadFromFile(clientcmd.RecommendedHomeFile)
+	if err != nil {
+		return "", err
+	}
+
+	// Use the client to retrieve the current context.
+	currentContext := kubeconfig.CurrentContext
+	context := kubeconfig.Contexts[currentContext]
+
+	// Use the context to retrieve the API server endpoint.
+	cluster := kubeconfig.Clusters[context.Cluster]
+	return cluster.Server, nil
+}

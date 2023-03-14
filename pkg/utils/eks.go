@@ -63,3 +63,51 @@ func HasOIDCProvider(clusterName, region string) (bool, error) {
 		return false, nil
 	}
 }
+
+func GetEksClusterNameByApiServerUrl(apiServerUrl string) (string, error) {
+	// Load the AWS configuration
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	// Create an EKS client
+	svc := eks.NewFromConfig(cfg)
+
+	// List all EKS clusters
+	resp, err := svc.ListClusters(context.TODO(), &eks.ListClustersInput{})
+	if err != nil {
+		return "", err
+	}
+
+	// Loop through each cluster and compare the API server URL
+	for _, clusterName := range resp.Clusters {
+		clusterInfo, err := svc.DescribeCluster(context.TODO(), &eks.DescribeClusterInput{
+			Name: aws.String(clusterName),
+		})
+		if err != nil {
+			return "", err
+		}
+		if *clusterInfo.Cluster.Endpoint == apiServerUrl {
+			return clusterName, nil
+		}
+	}
+
+	return "", fmt.Errorf("could not find an EKS cluster with the API server URL %s", apiServerUrl)
+}
+
+func GetCurrentEKSClusterName() (string, error) {
+	// Get the API server endpoint of the current kube context
+	apiEndpoint, err := GetCurrentKubeContextAPIEndpoint()
+	if err != nil {
+		return "", err
+	}
+
+	apiServerUrl := apiEndpoint
+	clusterName, err := GetEksClusterNameByApiServerUrl(apiServerUrl)
+	if err != nil {
+		return "", err
+	}
+
+	return clusterName, nil
+}

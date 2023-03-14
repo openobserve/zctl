@@ -14,12 +14,20 @@ import (
 func main() {
 	// cmd.Execute()
 
-	cluster := "dev2"
-	releaseName := "zo1"
+	clusterName, err := utils.GetCurrentEKSClusterName()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("EKS cluster name:", clusterName)
+
+	// cluster := "dev2"
+	// releaseName := "zo1"
 	// region := "us-west-2"
 
 	// utils.SetupAWS(cluster, releaseName, "us-west-2")
-	utils.TearDownAWS(cluster, releaseName)
+	// utils.TearDownAWS(cluster, releaseName)
+
 }
 
 // Create AWS IAM Role and Policy
