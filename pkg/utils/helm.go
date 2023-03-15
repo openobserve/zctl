@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func InstallUsingHelm(releaseName string) {
+func SetupHelm(releaseName, namespace string) {
 	fmt.Println("install called")
 
 	// Retrieve the URL of the Kubernetes cluster currently in use.
@@ -35,10 +35,10 @@ func InstallUsingHelm(releaseName string) {
 
 	// Create a new Helm object with the required deployment parameters.
 	h1 := Helm{
-		AppVersion:    "0.2.3",
+		AppVersion:    "v0.2.0",
 		ChartName:     "zincobserve",
-		ChartVersion:  "0.2.3",
-		Namespace:     "t2",
+		ChartVersion:  "0.2.4",
+		Namespace:     namespace,
 		ReleaseName:   releaseName,
 		RepositoryURL: "https://charts.zinc.dev",
 	}

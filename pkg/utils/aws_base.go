@@ -51,12 +51,18 @@ func SetupAWSBase(clusterName, releaseName, region string) (string, string, erro
 	return bucketName, roleArn, nil
 }
 
-func TearDownAWS(clusterName, releaseName string) {
+func TearDownAWS(releaseName string) {
 	fmt.Println("..............TearDownAWS............")
+
+	clusterName, err := GetCurrentEKSClusterName()
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
 
 	// Delete s3 bucket
 	bucketName := "zinc-observe-5080-" + clusterName + "-" + releaseName
-	err := DeleteS3Bucket(bucketName)
+	err = DeleteS3Bucket(bucketName)
 	if err != nil {
 		panic(err)
 	}

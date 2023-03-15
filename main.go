@@ -12,6 +12,6 @@ func main() {
 
 	releaseName := "zo1"
 	utils.SetupAWS(releaseName)
-	// utils.TearDownAWS(cluster, releaseName)
+	utils.TearDownAWS(releaseName)
 
 }
