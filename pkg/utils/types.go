@@ -16,6 +16,16 @@ type ZincObserveValues struct {
 	Resources          Resources          `yaml:"resources"`
 	Autoscaling        Autoscaling        `yaml:"autoscaling"`
 	Etcd               Etcd               `yaml:"etcd"`
+	CertIssuer         CertIssuer         `yaml:"certIssuer"`
+	Ingester           Ingester           `yaml:"ingester"`
+}
+
+type Ingester struct {
+	Persistence Persistence `yaml:"persistence"`
+}
+
+type CertIssuer struct {
+	Enabled bool `yaml:"enabled"`
 }
 
 type Image struct {
@@ -197,10 +207,16 @@ type NameValue struct {
 }
 
 type Persistence struct {
-	Size         string            `yaml:"size"`
-	StorageClass string            `yaml:"storageClass"`
-	AccessModes  []string          `yaml:"accessModes"`
-	Annotations  map[string]string `yaml:"annotations"`
+	Enabled           bool              `yaml:"enabled"`
+	Size              string            `yaml:"size"`
+	StorageClass      string            `yaml:"storageClass"`
+	AccessModes       []string          `yaml:"accessModes"`
+	Annotations       map[string]string `yaml:"annotations"`
+	VolumePermissions VolumePermission  `yaml:"volumePermissions"`
+}
+
+type VolumePermission struct {
+	Enabled bool `yaml:"enabled"`
 }
 
 type IAMPolicy struct {
