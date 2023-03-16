@@ -54,29 +54,31 @@ func SetupAWSBase(clusterName, releaseName, region string) (string, string, erro
 // TearDownAWS tears down the AWS resources associated with a given release.
 // It deletes the S3 bucket and the IAM role and policy.
 // If an error occurs, it panics with the error message.
-func TearDownAWS(releaseName string) {
+func TearDownAWS(releaseName string) error {
 	fmt.Println("..............TearDownAWS............")
 
 	// First, get the name of the current EKS cluster.
 	clusterName, err := GetCurrentEKSClusterName()
 	if err != nil {
 		fmt.Println(err)
-		panic(err)
+		return err
 	}
 
 	// Delete the S3 bucket associated with the release.
 	bucketName := "zinc-observe-5080-" + clusterName + "-" + releaseName
 	err = DeleteS3Bucket(bucketName)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// Delete the IAM role and policy associated with the release.
 	roleName := "zinc-observe-5080-" + clusterName + "-" + releaseName
 	err = DeleteIAMRoleWithPolicies(roleName)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 // GetDefaultAwsRegion retrieves the default region for the AWS account.

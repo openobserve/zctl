@@ -99,7 +99,7 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 		return "", err
 	}
 
-	fmt.Println("Created IAM role: ", roleResp.Role.Arn)
+	fmt.Println("Created IAM role: ", *roleResp.Role.Arn)
 
 	fmt.Println("..............Create IAM Role Policy............")
 

@@ -161,6 +161,33 @@ func (h *Helm) Install(chart *chart.Chart, kubeContext string) error {
 	return nil
 }
 
+func (h *Helm) UnInstall(releaseName, namespace string) error {
+
+	kubeConfig := cli.New()
+
+	// Set up the Helm action configuration.
+	actionConfig := new(action.Configuration)
+	if err := actionConfig.Init(kubeConfig.RESTClientGetter(), kubeConfig.Namespace(), os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
+		log.Fatalf("Failed to initialize Helm action configuration: %v", err)
+	}
+
+	if err := deleteHelmRelease(releaseName, actionConfig); err != nil {
+		log.Fatalf("Error deleting Helm release: %v", err)
+	}
+
+	return nil
+}
+
+func deleteHelmRelease(releaseName string, actionConfig *action.Configuration) error {
+	deleteAction := action.NewUninstall(actionConfig)
+	res, err := deleteAction.Run(releaseName)
+	if err != nil {
+		return fmt.Errorf("failed to delete Helm release: %w", err)
+	}
+	fmt.Printf("Release %s deleted: %s\n", releaseName, res.Release.Info.Description)
+	return nil
+}
+
 // List returns a list of all installed releases in the specified Kubernetes cluster.
 func List(kubeContext string) ([]*release.Release, error) {
 	// Initialize the Helm action configuration.
