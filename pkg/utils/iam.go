@@ -32,42 +32,47 @@ func GetS3PolicyDocument(bucketName string) string {
 	}`, bucketName)
 }
 
-// get AWS account number
+// GetAWSAccountID retrieves the AWS account number for the current user.
+// It returns the account number string, or an error if one occurs.
 func GetAWSAccountID() (string, error) {
 	fmt.Println("..............GetAWSAccountID............")
-	// Load the AWS configuration
+
+	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return "", err
 	}
 
-	// Create a new STS client
+	// Create a new STS client to interact with AWS Security Token Service (STS).
 	svc := sts.NewFromConfig(cfg)
 
-	// Call the GetCallerIdentity API to retrieve the account number
+	// Call the GetCallerIdentity API to retrieve the account number.
 	resp, err := svc.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
 	if err != nil {
 		return "", err
 	}
 
-	// Extract the account number from the response
+	// Extract the account number from the response.
 	accountID := aws.ToString(resp.Account)
 
 	return accountID, nil
 }
 
-// create IAM role with EKS trusted entity
+// CreateIAMRole creates an IAM role with the EKS trusted entity and attaches an S3 bucket policy to it.
+// It returns the ARN of the created role, or an error if one occurs.
 func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterName, releaseName, bucketName string) (string, error) {
 	fmt.Println("..............Create IAM Role............")
-	// Load the AWS configuration
+
+	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return "", err
 	}
 
-	// Create a new IAM client
+	// Create a new IAM client.
 	svc := iam.NewFromConfig(cfg)
 
+	// Define the trusted entity for the role.
 	trustedEntity := fmt.Sprintf(`{
 	"Version": "2012-10-17",
 	"Statement": [
@@ -81,13 +86,13 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 	]
 }`, accountId, region, issuerId)
 
-	// Create the role input
+	// Create the input for creating the role.
 	input := &iam.CreateRoleInput{
 		RoleName:                 aws.String(roleName),
 		AssumeRolePolicyDocument: aws.String(trustedEntity),
 	}
 
-	// Create the role
+	// Create the role.
 	roleResp, err := svc.CreateRole(context.Background(), input)
 	if err != nil {
 		fmt.Println("Error in CreateRole: ", err.Error())
@@ -98,11 +103,10 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 
 	fmt.Println("..............Create IAM Role Policy............")
 
-	// bucketName := "zinc-observe-" + clusterName + "-" + releaseName
-
+	// Create a policy document for the S3 bucket policy.
 	policyDocument := GetS3PolicyDocument(bucketName)
 
-	// Attach the policy to the role
+	// Attach the policy to the role.
 	_, err = svc.PutRolePolicy(context.Background(), &iam.PutRolePolicyInput{
 		PolicyName:     aws.String(policyName),
 		PolicyDocument: aws.String(policyDocument),
@@ -117,23 +121,27 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 	return *roleResp.Role.Arn, nil
 }
 
+// DeleteIAMRoleWithPolicies deletes an IAM role and all of its associated policies.
+// It returns an error if one occurs.
 func DeleteIAMRoleWithPolicies(roleName string) error {
 	fmt.Println("..............DeleteIAMRoleWithPolicies............")
-	// Load the AWS configuration
+
+	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return err
 	}
 
-	// Create a new IAM client
+	// Create a new IAM client.
 	svc := iam.NewFromConfig(cfg)
 
+	// Delete any inline policies attached to the role.
 	err = deleteInlineRolePolicies(roleName)
 	if err != nil {
 		return err
 	}
 
-	// Delete the role
+	// Delete the role.
 	_, err = svc.DeleteRole(context.Background(), &iam.DeleteRoleInput{
 		RoleName: aws.String(roleName),
 	})
@@ -145,17 +153,19 @@ func DeleteIAMRoleWithPolicies(roleName string) error {
 	return nil
 }
 
+// deleteInlineRolePolicies deletes all inline policies attached to an IAM role.
+// It returns an error if one occurs.
 func deleteInlineRolePolicies(roleName string) error {
-	// Load the AWS SDK config
+	// Load the AWS SDK config.
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return err
 	}
 
-	// Create a new IAM client
+	// Create a new IAM client.
 	svc := iam.NewFromConfig(cfg)
 
-	// List the inline policies attached to the role
+	// List the inline policies attached to the role.
 	resp, err := svc.ListRolePolicies(context.TODO(), &iam.ListRolePoliciesInput{
 		RoleName: &roleName,
 	})
@@ -163,7 +173,7 @@ func deleteInlineRolePolicies(roleName string) error {
 		return err
 	}
 
-	// Delete each inline policy attached to the role
+	// Delete each inline policy attached to the role.
 	for _, policyName := range resp.PolicyNames {
 		_, err := svc.DeleteRolePolicy(context.TODO(), &iam.DeleteRolePolicyInput{
 			RoleName:   &roleName,

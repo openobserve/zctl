@@ -9,23 +9,6 @@ import (
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
-// ClientConfig is used to make it easy to get an api server client
-//
-// type ClientConfig interface {
-// 	// RawConfig returns the merged result of all overrides
-// 	RawConfig() (clientcmdapi.Config, error)
-// 	// ClientConfig returns a complete client config
-// 	ClientConfig() (*restclient.Config, error)
-// 	// Namespace returns the namespace resulting from the merged
-// 	// result of all overrides and a boolean indicating if it was
-// 	// overridden
-// 	Namespace() (string, bool, error)
-// 	// ConfigAccess returns the rules for loading/persisting the config.
-// 	ConfigAccess() ConfigAccess
-// }
-
-// Raw is clientcmdapi.Config -- represents kubeconfig
-
 func Client(context string) (*kubernetes.Clientset, error) {
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
@@ -91,19 +74,6 @@ func Kubeconfig() (*clientcmdapi.Config, error) {
 
 	return &raw, nil
 }
-
-// func ClusterURLForCurrentContext() string {
-// 	raw, err := Kubeconfig()
-// 	if err != nil {
-// 		return ""
-// 	}
-
-// 	if err := clientcmdapi.MinifyConfig(raw); err != nil {
-// 		return ""
-// 	}
-
-// 	return raw.Clusters[raw.Contexts[raw.CurrentContext].Cluster].Server
-// }
 
 func GetCurrentKubeContextAPIEndpoint() (string, error) {
 	// Use the default kubeconfig file to create a Config object.

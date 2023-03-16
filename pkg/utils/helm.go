@@ -7,7 +7,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func SetupHelm(releaseName, namespace string) {
+// SetupHelm sets up the necessary kubernetes resources using official Helm charts.
+// It returns the name of the S3 bucket and the IAM role ARN that were created.
+// If an error occurs, it returns an empty string for both values and the error itself.
+func SetupHelm(releaseName, namespace string) error {
 	fmt.Println("install called")
 
 	// Retrieve the URL of the Kubernetes cluster currently in use.
@@ -15,7 +18,7 @@ func SetupHelm(releaseName, namespace string) {
 	if err != nil {
 		// Print an error message if an error occurs while retrieving the cluster URL.
 		fmt.Println("error: ", err)
-		return
+		return err
 	}
 
 	// Retrieve the context of the Kubernetes cluster using its URL.
@@ -23,6 +26,7 @@ func SetupHelm(releaseName, namespace string) {
 	if err != nil {
 		// Print an error message if an error occurs while retrieving the context.
 		fmt.Println("error: ", err)
+		return err
 	}
 
 	// Set up the required AWS resources for the application using a predefined setup function.
@@ -30,7 +34,7 @@ func SetupHelm(releaseName, namespace string) {
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)
-		panic(err)
+		return err
 	}
 
 	// Create a new Helm object with the required deployment parameters.
@@ -48,6 +52,7 @@ func SetupHelm(releaseName, namespace string) {
 	if err != nil {
 		// Print an error message if an error occurs while downloading the chart.
 		fmt.Println("error downloading: ", err)
+		return err
 	}
 
 	// Marshal the values of the Helm chart to JSON format.
@@ -55,7 +60,7 @@ func SetupHelm(releaseName, namespace string) {
 	if err != nil {
 		// Print an error message if an error occurs while marshaling the values to JSON.
 		fmt.Println("Error:", err)
-		return
+		return err
 	}
 
 	// Declare a variable to store the unmarshaled values from the Helm chart.
@@ -66,6 +71,7 @@ func SetupHelm(releaseName, namespace string) {
 	if err != nil {
 		// Print an error message if an error occurs while unmarshaling the values from JSON.
 		fmt.Println("error unmarshalling: ", err)
+		return err
 	}
 
 	// Print a value from the unmarshaled data for testing purposes.
@@ -83,6 +89,9 @@ func SetupHelm(releaseName, namespace string) {
 	if err != nil {
 		// Print an error message if an error occurs while installing the Helm chart.
 		fmt.Println("error installing: ", err)
+		return err
 	}
+
+	return nil
 
 }

@@ -8,25 +8,30 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-// create an s3 bucket
+// CreateS3Bucket creates an S3 bucket with the specified name.
 func CreateS3Bucket(bucketName string) error {
 	fmt.Println("..............Create S3 Bucket............")
+
+	// Create a new AWS session
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-west-2"),
+		Region: aws.String("us-west-2"), // Specify the AWS region
 	})
 	if err != nil {
 		return err
 	}
 
+	// Create a new S3 client
 	s3Client := s3.New(sess)
 
+	// Create the S3 bucket
 	_, err = s3Client.CreateBucket(&s3.CreateBucketInput{
-		Bucket: aws.String(bucketName),
+		Bucket: aws.String(bucketName), // Specify the bucket name
 	})
 	if err != nil {
 		return err
 	}
 
+	// Wait for the bucket to exist
 	err = s3Client.WaitUntilBucketExists(&s3.HeadBucketInput{
 		Bucket: aws.String(bucketName),
 	})
@@ -42,6 +47,7 @@ func CreateS3Bucket(bucketName string) error {
 // delete s3 bucket
 func DeleteS3Bucket(bucketName string) error {
 	fmt.Println("..............DeleteS3Bucket............")
+	// Create a new session with the AWS configuration
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("us-west-2"),
 	})
@@ -49,8 +55,10 @@ func DeleteS3Bucket(bucketName string) error {
 		return err
 	}
 
+	// Create a new S3 client
 	s3Client := s3.New(sess)
 
+	// Delete the S3 bucket
 	_, err = s3Client.DeleteBucket(&s3.DeleteBucketInput{
 		Bucket: aws.String(bucketName),
 	})
@@ -58,6 +66,7 @@ func DeleteS3Bucket(bucketName string) error {
 		return err
 	}
 
+	// Wait until the bucket is deleted
 	err = s3Client.WaitUntilBucketNotExists(&s3.HeadBucketInput{
 		Bucket: aws.String(bucketName),
 	})

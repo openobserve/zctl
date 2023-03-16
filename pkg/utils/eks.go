@@ -11,18 +11,21 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 )
 
+// GetEKSClusterDetails retrieves details for the specified EKS cluster.
+// It returns a pointer to the Cluster object or an error if one occurs.
 func GetEKSClusterDetails(clusterName string) (*types.Cluster, error) {
 	fmt.Println("..............Getting EKS Cluster Details............")
-	// Load the AWS configuration
+
+	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	// Create a new EKS client
+	// Create a new EKS client.
 	svc := eks.NewFromConfig(cfg)
 
-	// Call the DescribeCluster API to retrieve the cluster details
+	// Call the DescribeCluster API to retrieve the cluster details.
 	resp, err := svc.DescribeCluster(context.Background(), &eks.DescribeClusterInput{
 		Name: aws.String(clusterName),
 	})
