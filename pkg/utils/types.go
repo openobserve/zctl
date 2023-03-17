@@ -58,9 +58,11 @@ type SecurityContext struct {
 }
 
 type ReplicaCount struct {
-	Ingester int `yaml:"ingester"`
-	Querier  int `yaml:"querier"`
-	Router   int `yaml:"router"`
+	Ingester     int `yaml:"ingester"`
+	Querier      int `yaml:"querier"`
+	Router       int `yaml:"router"`
+	Alertmanager int `yaml:"alertmanager"`
+	Compactor    int `yaml:"compactor"`
 }
 
 type Auth struct {
@@ -220,6 +222,7 @@ type Etcd struct {
 	ReplicaCount int         `yaml:"replicaCount"`
 	Image        Image       `yaml:"image"`
 	ExtraEnvVars []NameValue `yaml:"extraEnvVars"`
+	Persistence  Persistence `yaml:"persistence"`
 }
 
 type NameValue struct {

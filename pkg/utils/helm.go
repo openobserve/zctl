@@ -75,41 +75,6 @@ func SetupHelm(releaseName, namespace, bucket, roleArn string) error {
 
 }
 
-func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn string) (map[string]interface{}, error) {
-	// Marshal the values of the Helm chart to JSON format.
-	jsonData, err := json.Marshal(baseValuesMap)
-	if err != nil {
-		// Print an error message if an error occurs while marshaling the values to JSON.
-		fmt.Println("Error:", err)
-		return nil, err
-	}
-
-	// Declare a variable to store the unmarshaled values from the Helm chart.
-	var data ZincObserveValues
-
-	// Unmarshal the values from JSON format and store them in the declared variable.
-	err = yaml.Unmarshal(jsonData, &data)
-	if err != nil {
-		// Print an error message if an error occurs while unmarshaling the values from JSON.
-		fmt.Println("error unmarshalling: ", err)
-		return nil, err
-	}
-
-	// Print a value from the unmarshaled data for testing purposes.
-	fmt.Println(data.Auth.ZO_ROOT_USER_EMAIL)
-
-	// Update the Helm chart values with the AWS bucket name and role ARN.
-	data.Config.ZOS3BUCKETNAME = bucket
-	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
-
-	// Convert the updated Helm chart values to a map and set them to the chart object.
-	finalMap, err := StructToMap2(data)
-	if err != nil {
-		return nil, err
-	}
-	return finalMap, nil
-}
-
 func TearDownHelm(releaseName, namespace string) {
 	fmt.Println("TearDownHelm called")
 
@@ -140,4 +105,43 @@ func TearDownHelm(releaseName, namespace string) {
 		fmt.Println("error uninstalling: ", err)
 	}
 
+}
+
+func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn string) (map[string]interface{}, error) {
+	// Marshal the values of the Helm chart to JSON format.
+	jsonData, err := json.Marshal(baseValuesMap)
+	if err != nil {
+		// Print an error message if an error occurs while marshaling the values to JSON.
+		fmt.Println("Error:", err)
+		return nil, err
+	}
+
+	// Declare a variable to store the unmarshaled values from the Helm chart.
+	var data ZincObserveValues
+
+	// Unmarshal the values from JSON format and store them in the declared variable.
+	err = yaml.Unmarshal(jsonData, &data)
+	if err != nil {
+		// Print an error message if an error occurs while unmarshaling the values from JSON.
+		fmt.Println("error unmarshalling: ", err)
+		return nil, err
+	}
+
+	// Print a value from the unmarshaled data for testing purposes.
+	fmt.Println(data.Auth.ZO_ROOT_USER_EMAIL)
+
+	// Update the Helm chart values with the AWS bucket name and role ARN.
+	data.Config.ZOS3BUCKETNAME = bucket
+	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
+	data.Image.Repository = "public.ecr.aws/zinclabs/zincobserve-dev"
+	data.Image.Tag = "v0.2.0-70cac60"
+
+	// Convert the updated Helm chart values to a map and set them to the chart object.
+	finalMap, err := StructToMap2(data)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("final Values.yaml: ")
+	PrettyPrint(finalMap)
+	return finalMap, nil
 }
