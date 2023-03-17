@@ -56,13 +56,6 @@ func SetupHelm(releaseName, namespace, bucket, roleArn string) error {
 		return err
 	}
 
-	// pretty print chart
-	b, err := json.MarshalIndent(chart.Values, "", "  ")
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	fmt.Print(string(b))
-
 	// Install the Helm chart with the updated values on the specified Kubernetes cluster context.
 	err = h1.Install(chart, context)
 	if err != nil {
