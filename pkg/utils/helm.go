@@ -35,7 +35,7 @@ func SetupHelm(releaseName, namespace, bucket, roleArn string) error {
 	h1 := Helm{
 		AppVersion:    "v0.2.0",
 		ChartName:     "zincobserve",
-		ChartVersion:  "0.2.5",
+		ChartVersion:  "0.2.6",
 		Namespace:     namespace,
 		ReleaseName:   releaseName,
 		RepositoryURL: "https://charts.zinc.dev",
@@ -103,7 +103,7 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
 
 	// Convert the updated Helm chart values to a map and set them to the chart object.
-	finalMap, err := StructToMap(data)
+	finalMap, err := StructToMap2(data)
 	if err != nil {
 		return nil, err
 	}

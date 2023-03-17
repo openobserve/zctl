@@ -15,9 +15,10 @@ type ZincObserveValues struct {
 	Ingress            Ingress            `yaml:"ingress"`
 	Resources          Resources          `yaml:"resources"`
 	Autoscaling        Autoscaling        `yaml:"autoscaling"`
-	Etcd               Etcd               `yaml:"etcd"`
 	CertIssuer         CertIssuer         `yaml:"certIssuer"`
 	Ingester           Ingester           `yaml:"ingester"`
+	Etcd               Etcd               `yaml:"etcd"`
+	MinIO              MinIO              `yaml:"minio"`
 }
 
 type Ingester struct {
@@ -192,9 +193,29 @@ type Autoscaling struct {
 	TargetCPUUtilizationPercentage    int  `yaml:"targetCPUUtilizationPercentage"`
 	TargetMemoryUtilizationPercentage int  `yaml:"targetMemoryUtilizationPercentage"`
 }
+type MinIO struct {
+	Enabled       bool        `yaml:"enabled"`
+	Region        string      `yaml:"region"`
+	RootUser      string      `yaml:"rootUser"`
+	RootPassword  string      `yaml:"rootPassword"`
+	DrivesPerNode int         `yaml:"drivesPerNode"`
+	Replicas      int         `yaml:"replicas"`
+	Mode          string      `yaml:"mode"`
+	Image         Image       `yaml:"image"`
+	MCImage       Image       `yaml:"mcImage"`
+	Buckets       []Bucket    `yaml:"buckets"`
+	Resources     Resources   `yaml:"resources"`
+	Persistence   Persistence `yaml:"persistence"`
+}
+
+type Bucket struct {
+	Name   string `yaml:"name"`
+	Policy string `yaml:"policy"`
+	Purge  bool   `yaml:"purge"`
+}
 
 type Etcd struct {
-	Bundled      bool        `yaml:"bundled"`
+	Enabled      bool        `yaml:"enabled"`
 	ExternalUrl  string      `yaml:"externalUrl"`
 	ReplicaCount int         `yaml:"replicaCount"`
 	Image        Image       `yaml:"image"`

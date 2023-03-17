@@ -13,7 +13,7 @@ func main() {
 	// cmd.Execute()
 
 	releaseName := "zo1"
-	namespace := "default"
+	namespace := "zo1"
 	// utils.Setup(releaseName, namespace)
 	err := utils.SetupHelm(releaseName, namespace, "zinc-observe-5080-dev2-zo1", "arn:aws:iam::058694856476:role/zinc-observe-5080-dev2-zo1")
 	if err != nil {
