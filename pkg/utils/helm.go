@@ -127,14 +127,21 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 	data.Config.ZOS3BUCKETNAME = bucket
 	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
 	data.Image.Repository = "public.ecr.aws/zinclabs/zincobserve-dev"
-	data.Image.Tag = "v0.2.0-70cac60"
+	data.Image.Tag = "v0.2.0-42e58f1"
+
+	yamlData, err := yaml.Marshal(&data)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("YAML data: ", string(yamlData))
 
 	// Convert the updated Helm chart values to a map and set them to the chart object.
 	finalMap, err := StructToMap2(data)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("final Values.yaml: ")
-	PrettyPrint(finalMap)
+	// fmt.Println("final Values.yaml: ")
+	// PrettyPrint(finalMap)
 	return finalMap, nil
 }

@@ -25,6 +25,7 @@ func GetS3PolicyDocument(bucketName string) string {
 					"s3:DeleteObject"
 				],
 				"Resource": [
+					"arn:aws:s3:::%s",
 					"arn:aws:s3:::%s/*"
 				]
 			}

@@ -28,3 +28,13 @@ Will install minio and use it for object storage on any k8s and install
 1. Create IAM policy
 1. Create IAM role
 1. Install helm chart
+
+
+Mimnimum Items to specify
+
+1. image.repository
+1. image.tag
+1. ServiceAccount.Annotations["eks.amazonaws.com/role-arn"]
+1. config.ZOS3BUCKETNAME
+1. 
+

@@ -223,6 +223,18 @@ type Etcd struct {
 	Image        Image       `yaml:"image"`
 	ExtraEnvVars []NameValue `yaml:"extraEnvVars"`
 	Persistence  Persistence `yaml:"persistence"`
+	Auth         EtcdAuth    `yaml:"auth"`
+	LogLevel     string      `yaml:"logLevel"`
+}
+
+type EtcdAuth struct {
+	RBAC RBAC `yaml:"rbac"`
+}
+
+type RBAC struct {
+	Create                  bool   `yaml:"create"`
+	AllowNoneAuthentication bool   `yaml:"allowNoneAuthentication"`
+	RootPassword            string `yaml:"rootPassword"`
 }
 
 type NameValue struct {

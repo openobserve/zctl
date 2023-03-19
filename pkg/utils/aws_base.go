@@ -70,6 +70,7 @@ func TearDownAWS(releaseName string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("S3 bucket deleted: ", bucketName)
 
 	// Delete the IAM role and policy associated with the release.
 	roleName := "zinc-observe-5080-" + clusterName + "-" + releaseName

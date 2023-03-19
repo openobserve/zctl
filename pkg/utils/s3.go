@@ -52,6 +52,7 @@ func DeleteS3Bucket(bucketName string) error {
 		Region: aws.String("us-west-2"),
 	})
 	if err != nil {
+		fmt.Println("error occured creating new aws session for deleting s3 bucket: ", err)
 		return err
 	}
 
@@ -63,6 +64,7 @@ func DeleteS3Bucket(bucketName string) error {
 		Bucket: aws.String(bucketName),
 	})
 	if err != nil {
+		fmt.Println("error occured deleting s3 bucket: ", bucketName, err)
 		return err
 	}
 
