@@ -24,7 +24,17 @@ func Setup(installIdentifer, releaseName string, namespace string) error {
 }
 
 func Teardown(releaseName, namespace string) error {
-	err := TearDownAWS(releaseName)
+	// Read the configmap
+	cm, err := ReadConfigMap("zincobserve-setup", namespace)
+	if err != nil {
+		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
+		fmt.Println("error: ", err)
+		return err
+	}
+
+	fmt.Println(cm["bucket_name"])
+
+	err = TearDownAWS(releaseName, cm["bucket_name"], cm["role_arn"])
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)

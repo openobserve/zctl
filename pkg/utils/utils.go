@@ -73,12 +73,14 @@ func GenerateReleaseIdentifier() string {
 	// Set the seed value for the random number generator
 	rand.Seed(time.Now().UnixNano())
 
-	// Generate a random number between 0 and 99999
-	randomNumber := rand.Intn(100000)
+	maxNumber := 10000000
+
+	// Generate a random number between 0 and maxNumber
+	randomNumber := rand.Intn(maxNumber)
 
 	// If the number is less than 10000, add leading zeros
-	if randomNumber < 10000 {
-		randomNumber += 10000
+	if randomNumber < maxNumber {
+		randomNumber += maxNumber
 	}
 
 	return fmt.Sprintf("%d", randomNumber)

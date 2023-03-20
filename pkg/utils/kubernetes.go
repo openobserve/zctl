@@ -68,8 +68,8 @@ func ReadConfigMap(name string, namespace string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	// create the ConfigMap
-	// _, err = clientset.CoreV1().ConfigMaps(namespace).Create(context.Background(), cm, metav1.CreateOptions{})
+
+	// Read the ConfigMap
 	cm, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.Background(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -78,6 +78,35 @@ func ReadConfigMap(name string, namespace string) (map[string]string, error) {
 	fmt.Println("ConfigMap read successfully")
 
 	return cm.Data, nil
+}
+
+func DeleteConfigMap(name string, namespace string) error {
+	// Use the default kubeconfig file to create a Config object.
+	kubeconfig, err := clientcmd.LoadFromFile(clientcmd.RecommendedHomeFile)
+	if err != nil {
+		return err
+	}
+
+	// create a configmap using the kubeconfig retrieved earlier
+	config, err := clientcmd.NewDefaultClientConfig(*kubeconfig, &clientcmd.ConfigOverrides{}).ClientConfig()
+	if err != nil {
+		return err
+	}
+
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return err
+	}
+
+	// Delete the ConfigMap
+	err = clientset.CoreV1().ConfigMaps(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("ConfigMap deleted successfully")
+
+	return nil
 }
 
 func Client(context string) (*kubernetes.Clientset, error) {

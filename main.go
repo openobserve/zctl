@@ -49,4 +49,6 @@ func main() {
 	for key, value := range cm {
 		fmt.Println(key, value)
 	}
+
+	utils.DeleteConfigMap(name, namespace)
 }
