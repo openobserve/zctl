@@ -6,8 +6,8 @@ import (
 
 // Setup function sets up AWS and Helm resources needed for the application.
 // It takes the releaseName and namespace as input and returns an error if one occurs.
-func Setup(releaseName string, namespace string) error {
-	bucket, roleArn, err := SetupAWS(releaseName)
+func Setup(installIdentifer, releaseName string, namespace string) error {
+	bucket, roleArn, err := SetupAWS(installIdentifer, releaseName)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)

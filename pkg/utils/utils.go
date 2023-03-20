@@ -3,8 +3,10 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"reflect"
+	"time"
 )
 
 func StructToMap2(s interface{}) (map[string]interface{}, error) {
@@ -65,4 +67,19 @@ func PrettyPrint(s1 map[string]interface{}) {
 		fmt.Println("error:", err)
 	}
 	os.Stdout.Write(b)
+}
+
+func GenerateReleaseIdentifier() string {
+	// Set the seed value for the random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	// Generate a random number between 0 and 99999
+	randomNumber := rand.Intn(100000)
+
+	// If the number is less than 10000, add leading zeros
+	if randomNumber < 10000 {
+		randomNumber += 10000
+	}
+
+	return fmt.Sprintf("%d", randomNumber)
 }

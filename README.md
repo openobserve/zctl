@@ -38,3 +38,23 @@ Mimnimum Items to specify
 1. config.ZOS3BUCKETNAME
 1. 
 
+# Install
+
+1. Check if a configmap exists with the name zincobserve-setup. If the configmap exists then a setup has already been done.
+1. If configmap does not exist then proceed
+1. get namespace and releaseName
+1. Generate a random install identifier.
+1. Create a configmap with name zincobserve-setup with releasename and install identifier
+1. bucketname should be 
+
+
+configmap should have following values . e.g
+
+{
+  "identifier": "23345",
+  "release_name": "zo1"
+  "bucket_name": "zinc-observe-23345-zo1",
+  "iam_role: "arn:aws:iam::058694856476:role/zinc-observe-5080-dev2-zo1"
+}
+
+

@@ -9,7 +9,7 @@ import (
 )
 
 // SetupAWSBase creates an S3 bucket, IAM role and inline policy for the role. It returns the ARN of the role.
-func SetupAWSBase(clusterName, releaseName, region string) (string, string, error) {
+func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (string, string, error) {
 	fmt.Println("..............Starting AWS Setup............")
 	exists, err := HasOIDCProvider(clusterName, region)
 	if err != nil {
@@ -35,14 +35,14 @@ func SetupAWSBase(clusterName, releaseName, region string) (string, string, erro
 	}
 
 	// create an s3 bucket
-	bucketName := "zinc-observe-5080-" + clusterName + "-" + releaseName
+	bucketName := "zinc-observe-" + releaseIdentifer + "-" + clusterName + "-" + releaseName
 	err = CreateS3Bucket(bucketName)
 	if err != nil {
 		return "", "", err
 	}
 
 	// create an IAM role
-	roleName := "zinc-observe-5080-" + clusterName + "-" + releaseName
+	roleName := "zinc-observe-" + releaseIdentifer + "-" + clusterName + "-" + releaseName
 	roleArn, err := CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
 	if err != nil {
 		return "", "", err
@@ -55,6 +55,7 @@ func SetupAWSBase(clusterName, releaseName, region string) (string, string, erro
 // It deletes the S3 bucket and the IAM role and policy.
 // If an error occurs, it panics with the error message.
 func TearDownAWS(releaseName string) error {
+	releaseIdentifier := GetReleaseIdentifierFromReleaseName(releaseName)
 	fmt.Println("..............TearDownAWS............")
 
 	// First, get the name of the current EKS cluster.
@@ -65,7 +66,7 @@ func TearDownAWS(releaseName string) error {
 	}
 
 	// Delete the S3 bucket associated with the release.
-	bucketName := "zinc-observe-5080-" + clusterName + "-" + releaseName
+	bucketName := "zinc-observe-" + releaseIdentifier + "-" + clusterName + "-" + releaseName
 	err = DeleteS3Bucket(bucketName)
 	if err != nil {
 		return err
@@ -73,7 +74,7 @@ func TearDownAWS(releaseName string) error {
 	fmt.Println("S3 bucket deleted: ", bucketName)
 
 	// Delete the IAM role and policy associated with the release.
-	roleName := "zinc-observe-5080-" + clusterName + "-" + releaseName
+	roleName := "zinc-observe-5080-" + releaseIdentifier + "-" + clusterName + "-" + releaseName
 	err = DeleteIAMRoleWithPolicies(roleName)
 	if err != nil {
 		return err
