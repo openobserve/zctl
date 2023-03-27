@@ -50,10 +50,10 @@ Mimnimum Items to specify
 configmap should have following values . e.g
 
 setup_data: {
-"identifier": "23345",
+"identifier": "15096452",
 "release_name": "zo1"
-"bucket_name": "zinc-observe-23345-zo1",
-"iam_role: "zinc-observe-5080-dev2-zo1"
+"bucket_name": "zinc-observe-15096452-dev2-zo1",
+"iam_role: "zinc-observe-15096452-dev2-zo1"
 }
 
 # What is working today
