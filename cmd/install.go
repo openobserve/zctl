@@ -57,22 +57,14 @@ var installCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(installCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// installCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// installCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 	K8s := "eks"
 	installCmd.Flags().StringVar(&K8s, "k8s", "eks", "k8s cluster type. eks, gke, plain")
 	installCmd.MarkFlagRequired("k8s")
 
 	namespace := ""
 	installCmd.Flags().StringVar(&namespace, "namespace", "", "namespace to install the helm chart1")
-	// installCmd.MarkFlagRequired("namespace")
+
+	region := ""
+	installCmd.Flags().StringVar(&region, "region", "", "region to install the installation in.")
 
 }

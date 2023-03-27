@@ -50,4 +50,7 @@ func init() {
 	namespace := ""
 	deleteCmd.Flags().StringVar(&namespace, "namespace", "default", "namespace to install the helm chart")
 	deleteCmd.MarkFlagRequired("namespace")
+
+	region := ""
+	deleteCmd.Flags().StringVar(&region, "region", "", "region to delete the installation from ")
 }
