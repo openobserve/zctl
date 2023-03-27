@@ -39,9 +39,9 @@ func SetupHelm(releaseName, namespace, bucket, role string) error {
 
 	// Create a new Helm object with the required deployment parameters.
 	h1 := Helm{
-		AppVersion:    "v0.2.0",
+		AppVersion:    "v0.3.1",
 		ChartName:     "zincobserve",
-		ChartVersion:  "0.2.6",
+		ChartVersion:  "0.3.1",
 		Namespace:     namespace,
 		ReleaseName:   releaseName,
 		RepositoryURL: "https://charts.zinc.dev",
@@ -116,12 +116,12 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 	data.Image.Repository = "public.ecr.aws/zinclabs/zincobserve"
 	data.Image.Tag = "v0.3.1"
 
-	yamlData, err := yaml.Marshal(&data)
-	if err != nil {
-		return nil, err
-	}
+	// yamlData, err := yaml.Marshal(&data)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	fmt.Println("YAML data: ", string(yamlData))
+	// fmt.Println("YAML data: ", string(yamlData))
 
 	// Convert the updated Helm chart values to a map and set them to the chart object.
 	finalMap, err := StructToMap2(data)
