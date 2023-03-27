@@ -1,6 +1,5 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -8,20 +7,33 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/zinclabs/zctl/pkg/utils"
 )
 
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Deletes a ZincObserve installation in the EKS cluster",
+	Long: `
+Deletes a ZincObserve installation in the EKS cluster. The subtasks include:
+1. Delete the ConfigMap
+2. Delete the IAM role
+3. Delete the S3 bucket
+4. Delete the helm release
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+		name := cmd.Flags().Lookup("name").Value.String()
+		fmt.Println("delete called with name: ", name)
+
+		ns := cmd.Flags().Lookup("namespace")
+		fmt.Println("delete called with namespace: ", ns)
+
+		namespace := cmd.Flags().Lookup("namespace").Value.String()
+		if namespace == "" {
+			namespace, _ = utils.GetCurrentNamespace()
+		}
+		utils.Teardown(name, namespace)
 	},
 }
 
@@ -37,4 +49,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	namespace := ""
+	deleteCmd.Flags().StringVar(&namespace, "namespace", "default", "namespace to install the helm chart")
+	deleteCmd.MarkFlagRequired("namespace")
 }

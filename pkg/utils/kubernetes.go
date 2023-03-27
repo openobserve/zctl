@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"k8s.io/client-go/dynamic"
@@ -13,7 +14,20 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateConfigMap(data map[string]string, name string, namespace string) error {
+func CreateConfigMap(sData SetupData, namespace string) error {
+	name := "zincobserve-setup"
+
+	// var data = make(map[string]string)
+
+	dataBytes, err := json.Marshal(sData)
+	if err != nil {
+		return err
+	}
+
+	// convert the dataBytes to map[string]string
+	data := map[string]string{
+		"data": string(dataBytes),
+	}
 
 	// Use the default kubeconfig file to create a Config object.
 	kubeconfig, err := clientcmd.LoadFromFile(clientcmd.RecommendedHomeFile)
@@ -51,33 +65,46 @@ func CreateConfigMap(data map[string]string, name string, namespace string) erro
 	return nil
 }
 
-func ReadConfigMap(name string, namespace string) (map[string]string, error) {
+func ReadConfigMap(name string, namespace string) (SetupData, error) {
+
+	setupData := SetupData{
+		Identifier:  "",
+		BucketName:  "",
+		ReleaseName: "",
+		IamRole:     "",
+	}
 	// Use the default kubeconfig file to create a Config object.
 	kubeconfig, err := clientcmd.LoadFromFile(clientcmd.RecommendedHomeFile)
 	if err != nil {
-		return nil, err
+		return setupData, err
 	}
 
 	// create a configmap using the kubeconfig retrieved earlier
 	config, err := clientcmd.NewDefaultClientConfig(*kubeconfig, &clientcmd.ConfigOverrides{}).ClientConfig()
 	if err != nil {
-		return nil, err
+		return setupData, err
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		return setupData, err
 	}
 
 	// Read the ConfigMap
 	cm, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.Background(), name, metav1.GetOptions{})
 	if err != nil {
-		return nil, err
+		return setupData, err
+	}
+
+	// marshal the configma data object into setupData
+	err = json.Unmarshal([]byte(cm.Data["data"]), &setupData)
+	if err != nil {
+		return setupData, err
 	}
 
 	fmt.Println("ConfigMap read successfully")
 
-	return cm.Data, nil
+	return setupData, nil
 }
 
 func DeleteConfigMap(name string, namespace string) error {

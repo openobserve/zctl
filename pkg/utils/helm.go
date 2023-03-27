@@ -12,7 +12,14 @@ import (
 // If an error occurs, it returns an empty string for both values and the error itself.
 // It requires the name of the release, the namespace to deploy to, the name of the S3 bucket, and the IAM role ARN.
 // If namespace is an empty string, it will default to "default". If namespace does not exist, it will be created.
-func SetupHelm(releaseName, namespace, bucket, roleArn string) error {
+func SetupHelm(releaseName, namespace, bucket, role string) error {
+	// arn:aws:iam::12345353456:role/zo-s3-eks
+	accountId, err := GetAWSAccountID()
+	if err != nil {
+		fmt.Println("error: ", err)
+		return err
+	}
+	roleArn := "arn:aws:iam::" + accountId + ":role/"+ role
 	fmt.Println("install called")
 
 	// Retrieve the URL of the Kubernetes cluster currently in use.
@@ -127,7 +134,7 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 	data.Config.ZOS3BUCKETNAME = bucket
 	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
 	data.Image.Repository = "public.ecr.aws/zinclabs/zincobserve-dev"
-	data.Image.Tag = "v0.2.0-42e58f1"
+	data.Image.Tag = "v0.3.1"
 
 	yamlData, err := yaml.Marshal(&data)
 	if err != nil {

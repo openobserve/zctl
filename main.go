@@ -3,18 +3,14 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 */
 package main
 
-import (
-	"fmt"
-
-	"github.com/zinclabs/zctl/pkg/utils"
-)
+import "github.com/zinclabs/zctl/cmd"
 
 func main() {
-	// cmd.Execute()
+	cmd.Execute()
 
 	// releaseName := "zo1"
 	// namespace := "zo1"
-	namespace, _ := utils.GetCurrentNamespace()
+	// namespace, _ := utils.GetCurrentNamespace()
 	// releaseIdentifer := utils.GenerateReleaseIdentifier()
 	// utils.Setup(releaseIdentifer, releaseName, namespace)
 	// err := utils.SetupHelm(releaseName, namespace, "zinc-observe-5080-dev2-zo1", "arn:aws:iam::058694856476:role/zinc-observe-5080-dev2-zo1")
@@ -27,7 +23,7 @@ func main() {
 	// utils.Teardown(releaseName, namespace)
 	// utils.TearDownAWS(releaseName)
 
-	name := "zincobserve-setup"
+	// name := "zincobserve-setup"
 
 	// data := map[string]string{
 	// 	"identifier":   "40075",
@@ -41,14 +37,14 @@ func main() {
 	// 	panic(err.Error())
 	// }
 
-	cm, err := utils.ReadConfigMap(name, namespace)
-	if err != nil {
-		panic(err.Error())
-	}
+	// cm, err := utils.ReadConfigMap(name, namespace)
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
 
-	for key, value := range cm {
-		fmt.Println(key, value)
-	}
+	// for key, value := range cm {
+	// 	fmt.Println(key, value)
+	// }
 
-	utils.DeleteConfigMap(name, namespace)
+	// utils.DeleteConfigMap(name, namespace)
 }

@@ -22,11 +22,11 @@ func SetupAWS(installIdentifer, releaseName string) (string, string, error) {
 	}
 
 	// Set up the necessary AWS resources (S3 bucket and IAM role) for the release.
-	bucketName, roleArn, err := SetupAWSBase(installIdentifer, clusterName, releaseName, region)
+	bucketName, roleName, err := SetupAWSBase(installIdentifer, clusterName, releaseName, region)
 	if err != nil {
 		return "", "", err
 	}
 
 	// Return the names of the created resources.
-	return bucketName, roleArn, nil
+	return bucketName, roleName, nil
 }

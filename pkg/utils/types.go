@@ -266,3 +266,10 @@ type Statement struct {
 	Action   []string `json:"Action"`
 	Resource []string `json:"Resource"`
 }
+
+type SetupData struct {
+	Identifier  string `json:"identifier"`   // unique identifier generated randomly to avoid conflicts
+	BucketName  string `json:"bucket_name"`  // s3 bucket name
+	ReleaseName string `json:"release_name"` // helm release name
+	IamRole     string `json:"iam_role"`     // role name
+}

@@ -7,19 +7,42 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/zinclabs/zctl/pkg/utils"
 )
 
 // installCmd represents the install command
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Installs ZincObserve",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-observe provides easy yet sophisticated observability for your Kubernetes clusters
-Zinc.`,
+	Long: `Installs ZincObserve. The subtasks include:
+	1. Create a S3 bucket
+	2. Create an IAM role with inline policy that is trusted by EKS OIDC provider
+	3. Install in the EKS cluster using the helm chart
+	3. Create a ConfigMap with the release_name, bucket_name and IAM role
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name := cmd.Flags().Lookup("name").Value.String()
 		fmt.Println("install called with name: ", name)
+
+		namespace := cmd.Flags().Lookup("namespace").Value.String()
+
+		fmt.Println("install called with namespace: ", namespace)
+
+		// Let's do the setup
+
+		releaseIdentifer := utils.GenerateReleaseIdentifier()
+
+		if namespace == "" {
+			namespace, _ := utils.GetCurrentNamespace()
+
+			setupData, err := utils.Setup(releaseIdentifer, name, namespace)
+			if err != nil {
+				fmt.Println("Error: ", err)
+			}
+
+			utils.CreateConfigMap(setupData, namespace)
+		}
+
 	},
 }
 
@@ -39,5 +62,9 @@ func init() {
 	K8s := "eks"
 	installCmd.Flags().StringVar(&K8s, "k8s", "eks", "k8s cluster type. eks, gke, plain")
 	installCmd.MarkFlagRequired("k8s")
+
+	namespace := ""
+	installCmd.Flags().StringVar(&namespace, "namespace", "", "namespace to install the helm chart1")
+	// installCmd.MarkFlagRequired("namespace")
 
 }

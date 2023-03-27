@@ -43,39 +43,39 @@ func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (st
 
 	// create an IAM role
 	roleName := "zinc-observe-" + releaseIdentifer + "-" + clusterName + "-" + releaseName
-	roleArn, err := CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
+	_, err = CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
 	if err != nil {
 		return "", "", err
 	}
 
-	return bucketName, roleArn, nil
+	return bucketName, roleName, nil
 }
 
 // TearDownAWS tears down the AWS resources associated with a given release.
 // It deletes the S3 bucket and the IAM role and policy.
 // If an error occurs, it panics with the error message.
-func TearDownAWS(releaseName, bucketName, roleArn string) error {
-	releaseIdentifier := GetReleaseIdentifierFromReleaseName(releaseName)
-	fmt.Println("..............TearDownAWS............")
+func TearDownAWS(setupData SetupData) error {
+	// releaseIdentifier := GetReleaseIdentifierFromReleaseName(releaseName)
+	// fmt.Println("..............TearDownAWS............")
 
 	// First, get the name of the current EKS cluster.
-	clusterName, err := GetCurrentEKSClusterName()
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+	// clusterName, err := GetCurrentEKSClusterName()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return err
+	// }
 
 	// Delete the S3 bucket associated with the release.
 	// bucketName := "zinc-observe-" + releaseIdentifier + "-" + clusterName + "-" + releaseName
-	err = DeleteS3Bucket(bucketName)
+	err := DeleteS3Bucket(setupData.BucketName)
 	if err != nil {
 		return err
 	}
-	fmt.Println("S3 bucket deleted: ", bucketName)
+	fmt.Println("S3 bucket deleted: ", setupData.BucketName)
 
 	// Delete the IAM role and policy associated with the release.
-	roleName := "zinc-observe-5080-" + releaseIdentifier + "-" + clusterName + "-" + releaseName
-	err = DeleteIAMRoleWithPolicies(roleName)
+	// roleName := "zinc-observe-5080-" + releaseIdentifier + "-" + clusterName + "-" + releaseName
+	err = DeleteIAMRoleWithPolicies(setupData.IamRole)
 	if err != nil {
 		return err
 	}
