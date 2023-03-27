@@ -5,16 +5,9 @@ import "fmt"
 // SetupAWS sets up the necessary AWS resources for a given release.
 // It returns the name of the S3 bucket and the IAM role ARN that were created.
 // If an error occurs, it returns an empty string for both values and the error itself.
-func SetupAWS(installIdentifer, releaseName string) (string, string, error) {
+func SetupAWS(installIdentifer, releaseName, region string) (string, string, error) {
 	// First, get the name of the current EKS cluster.
 	clusterName, err := GetCurrentEKSClusterName()
-	if err != nil {
-		fmt.Println(err)
-		return "", "", err
-	}
-
-	// Next, get the default region for the AWS account.
-	region, err := GetDefaultAwsRegion()
 	if err != nil {
 		fmt.Println(err)
 		return "", "", err

@@ -35,7 +35,7 @@ func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (st
 
 	// create an s3 bucket
 	bucketName := "zinc-observe-" + releaseIdentifer + "-" + clusterName + "-" + releaseName
-	err = CreateS3Bucket(bucketName)
+	err = CreateS3Bucket(bucketName, region)
 	if err != nil {
 		return "", "", err
 	}
@@ -53,8 +53,8 @@ func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (st
 // TearDownAWS tears down the AWS resources associated with a given release.
 // It deletes the S3 bucket and the IAM role and policy.
 // If an error occurs, it panics with the error message.
-func TearDownAWS(setupData SetupData) error {
-	err := DeleteS3Bucket(setupData.BucketName)
+func TearDownAWS(setupData SetupData, region string) error {
+	err := DeleteS3Bucket(setupData.BucketName, region)
 	if err != nil {
 		return err
 	}

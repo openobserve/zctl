@@ -27,7 +27,11 @@ Deletes a ZincObserve installation in the EKS cluster. The subtasks include:
 		if namespace == "" {
 			namespace, _ = utils.GetCurrentNamespace()
 		}
-		utils.Teardown(name, namespace)
+		region := cmd.Flags().Lookup("region").Value.String()
+		if region == "" {
+			region, _ = utils.GetDefaultAwsRegion()
+		}
+		utils.Teardown(name, namespace, region)
 	},
 }
 

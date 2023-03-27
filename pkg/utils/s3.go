@@ -9,12 +9,16 @@ import (
 )
 
 // CreateS3Bucket creates an S3 bucket with the specified name.
-func CreateS3Bucket(bucketName string) error {
+func CreateS3Bucket(bucketName, region string) error {
+	if region == "" {
+		region = "us-west-2"
+	}
+
 	fmt.Println(".Creating S3 Bucket............")
 
 	// Create a new AWS session
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-west-2"), // Specify the AWS region
+		Region: aws.String(region), // Specify the AWS region
 	})
 	if err != nil {
 		return err
@@ -45,11 +49,14 @@ func CreateS3Bucket(bucketName string) error {
 }
 
 // delete s3 bucket
-func DeleteS3Bucket(bucketName string) error {
+func DeleteS3Bucket(bucketName, region string) error {
+	if region == "" {
+		region = "us-west-2"
+	}
 	fmt.Println("DeleteS3Bucket............")
 	// Create a new session with the AWS configuration
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-west-2"),
+		Region: aws.String(region),
 	})
 	if err != nil {
 		fmt.Println("error occured creating new aws session for deleting s3 bucket: ", err)

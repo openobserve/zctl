@@ -6,7 +6,7 @@ import (
 
 // Setup function sets up AWS and Helm resources needed for the application.
 // It takes the releaseName and namespace as input and returns an error if one occurs.
-func Setup(installIdentifer, releaseName string, namespace string) (SetupData, error) {
+func Setup(installIdentifer, releaseName string, namespace string, region string) (SetupData, error) {
 
 	setupData := SetupData{}
 
@@ -18,7 +18,7 @@ func Setup(installIdentifer, releaseName string, namespace string) (SetupData, e
 		return setupData, err
 	}
 
-	bucket, role, err := SetupAWS(installIdentifer, releaseName)
+	bucket, role, err := SetupAWS(installIdentifer, releaseName, region)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)
@@ -42,7 +42,7 @@ func Setup(installIdentifer, releaseName string, namespace string) (SetupData, e
 	return setupData, nil
 }
 
-func Teardown(releaseName, namespace string) error {
+func Teardown(releaseName, namespace, region string) error {
 
 	// Get details from configmap
 	cmName := "zincobserve-setup"
@@ -56,7 +56,7 @@ func Teardown(releaseName, namespace string) error {
 
 	fmt.Println(cm)
 
-	err = TearDownAWS(cm)
+	err = TearDownAWS(cm, region)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)
