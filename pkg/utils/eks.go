@@ -14,8 +14,6 @@ import (
 // GetEKSClusterDetails retrieves details for the specified EKS cluster.
 // It returns a pointer to the Cluster object or an error if one occurs.
 func GetEKSClusterDetails(clusterName string) (*types.Cluster, error) {
-	fmt.Println("..............Getting EKS Cluster Details............")
-
 	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
@@ -33,8 +31,6 @@ func GetEKSClusterDetails(clusterName string) (*types.Cluster, error) {
 		return nil, err
 	}
 
-	fmt.Println("Got Cluster Details. Will use these details to create the IAM role for the cluster.")
-
 	return resp.Cluster, nil
 }
 
@@ -42,7 +38,6 @@ func GetEKSClusterDetails(clusterName string) (*types.Cluster, error) {
 // The function takes in the name of the cluster and its region as arguments.
 // The function returns a boolean value indicating whether an OIDC provider exists for the cluster and an error if one occurs.
 func HasOIDCProvider(clusterName, region string) (bool, error) {
-	fmt.Println("..............Checking if an OIDC Provider already exists for the cluster............")
 	// Load the default AWS SDK configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {

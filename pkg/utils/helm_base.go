@@ -143,7 +143,7 @@ func (h *Helm) Install(chart *chart.Chart, kubeContext string) error {
 	chart.Metadata.AppVersion = h.AppVersion
 
 	// Install the chart.
-	fmt.Println("Helm installing...")
+	fmt.Println("Installing using helm chart...")
 	rel, err := instAction.Run(chart, values)
 	if err != nil {
 		return fmt.Errorf("helm install failed: %s", err)

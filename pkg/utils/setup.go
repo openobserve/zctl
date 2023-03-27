@@ -25,7 +25,6 @@ func Setup(installIdentifer, releaseName string, namespace string) (SetupData, e
 		return setupData, err
 	}
 
-	
 	err = SetupHelm(releaseName, namespace, bucket, role)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up Helm resources.

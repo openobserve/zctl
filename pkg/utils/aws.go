@@ -12,7 +12,6 @@ func SetupAWS(installIdentifer, releaseName string) (string, string, error) {
 		fmt.Println(err)
 		return "", "", err
 	}
-	fmt.Println("EKS cluster name:", clusterName)
 
 	// Next, get the default region for the AWS account.
 	region, err := GetDefaultAwsRegion()

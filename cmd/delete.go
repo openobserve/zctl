@@ -4,8 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/zinclabs/zctl/pkg/utils"
 )
@@ -24,10 +22,6 @@ Deletes a ZincObserve installation in the EKS cluster. The subtasks include:
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name := cmd.Flags().Lookup("name").Value.String()
-		fmt.Println("delete called with name: ", name)
-
-		ns := cmd.Flags().Lookup("namespace")
-		fmt.Println("delete called with namespace: ", ns)
 
 		namespace := cmd.Flags().Lookup("namespace").Value.String()
 		if namespace == "" {

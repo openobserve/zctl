@@ -10,7 +10,7 @@ import (
 
 // CreateS3Bucket creates an S3 bucket with the specified name.
 func CreateS3Bucket(bucketName string) error {
-	fmt.Println("..............Create S3 Bucket............")
+	fmt.Println(".Creating S3 Bucket............")
 
 	// Create a new AWS session
 	sess, err := session.NewSession(&aws.Config{
@@ -46,7 +46,7 @@ func CreateS3Bucket(bucketName string) error {
 
 // delete s3 bucket
 func DeleteS3Bucket(bucketName string) error {
-	fmt.Println("..............DeleteS3Bucket............")
+	fmt.Println("DeleteS3Bucket............")
 	// Create a new session with the AWS configuration
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("us-west-2"),

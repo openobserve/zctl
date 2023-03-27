@@ -12,7 +12,6 @@ import (
 )
 
 func GetS3PolicyDocument(bucketName string) string {
-	fmt.Println("..............GetS3PolicyDocument............")
 	policy := fmt.Sprintf(`{
 			"Version": "2012-10-17",
 			"Statement": [
@@ -38,7 +37,6 @@ func GetS3PolicyDocument(bucketName string) string {
 // GetAWSAccountID retrieves the AWS account number for the current user.
 // It returns the account number string, or an error if one occurs.
 func GetAWSAccountID() (string, error) {
-	fmt.Println("..............GetAWSAccountID............")
 
 	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
@@ -64,7 +62,7 @@ func GetAWSAccountID() (string, error) {
 // CreateIAMRole creates an IAM role with the EKS trusted entity and attaches an S3 bucket policy to it.
 // It returns the ARN of the created role, or an error if one occurs.
 func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterName, releaseName, bucketName string) (string, error) {
-	fmt.Println("..............Create IAM Role............")
+	fmt.Println("Creating IAM role...")
 
 	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())
@@ -104,7 +102,7 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 
 	fmt.Println("Created IAM role: ", *roleResp.Role.Arn)
 
-	fmt.Println("..............Create IAM Role Policy............")
+	fmt.Println("Creating inline policy for IAM role............")
 
 	// Create a policy document for the S3 bucket policy.
 	policyDocument := GetS3PolicyDocument(bucketName)
@@ -127,7 +125,7 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 // DeleteIAMRoleWithPolicies deletes an IAM role and all of its associated policies.
 // It returns an error if one occurs.
 func DeleteIAMRoleWithPolicies(roleName string) error {
-	fmt.Println("..............DeleteIAMRoleWithPolicies............")
+	fmt.Println("DeleteIAMRoleWithPolicies............")
 
 	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())

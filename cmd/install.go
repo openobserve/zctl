@@ -22,14 +22,10 @@ var installCmd = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name := cmd.Flags().Lookup("name").Value.String()
-		fmt.Println("install called with name: ", name)
 
 		namespace := cmd.Flags().Lookup("namespace").Value.String()
 
-		fmt.Println("install called with namespace: ", namespace)
-
 		// Let's do the setup
-
 		releaseIdentifer := utils.GenerateReleaseIdentifier()
 
 		if namespace == "" {

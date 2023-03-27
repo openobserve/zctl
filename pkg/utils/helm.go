@@ -19,8 +19,7 @@ func SetupHelm(releaseName, namespace, bucket, role string) error {
 		fmt.Println("error: ", err)
 		return err
 	}
-	roleArn := "arn:aws:iam::" + accountId + ":role/"+ role
-	fmt.Println("install called")
+	roleArn := "arn:aws:iam::" + accountId + ":role/" + role
 
 	// Retrieve the URL of the Kubernetes cluster currently in use.
 	clusterURL, err := GetCurrentKubeContextAPIEndpoint()
@@ -76,22 +75,6 @@ func SetupHelm(releaseName, namespace, bucket, role string) error {
 }
 
 func TearDownHelm(releaseName, namespace string) {
-	fmt.Println("TearDownHelm called")
-
-	// Retrieve the URL of the Kubernetes cluster currently in use.
-	// clusterURL, err := GetCurrentKubeContextAPIEndpoint()
-	// if err != nil {
-	// 	// Print an error message if an error occurs while retrieving the cluster URL.
-	// 	fmt.Println("error: ", err)
-	// }
-
-	// Retrieve the context of the Kubernetes cluster using its URL.
-	// context, err := KubeContextForCluster(clusterURL)
-	// if err != nil {
-	// 	// Print an error message if an error occurs while retrieving the context.
-	// 	fmt.Println("error: ", err)
-	// }
-
 	// Create a new Helm object with the required deployment parameters.
 	h1 := Helm{
 		Namespace:   namespace,
@@ -127,9 +110,6 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 		return nil, err
 	}
 
-	// Print a value from the unmarshaled data for testing purposes.
-	fmt.Println(data.Auth.ZO_ROOT_USER_EMAIL)
-
 	// Update the Helm chart values with the AWS bucket name and role ARN.
 	data.Config.ZOS3BUCKETNAME = bucket
 	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
@@ -148,7 +128,6 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("final Values.yaml: ")
-	// PrettyPrint(finalMap)
+
 	return finalMap, nil
 }

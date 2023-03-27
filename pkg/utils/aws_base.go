@@ -10,7 +10,6 @@ import (
 
 // SetupAWSBase creates an S3 bucket, IAM role and inline policy for the role. It returns the ARN of the role.
 func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (string, string, error) {
-	fmt.Println("..............Starting AWS Setup............")
 	exists, err := HasOIDCProvider(clusterName, region)
 	if err != nil {
 		fmt.Println("error: ", err)
@@ -55,26 +54,11 @@ func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (st
 // It deletes the S3 bucket and the IAM role and policy.
 // If an error occurs, it panics with the error message.
 func TearDownAWS(setupData SetupData) error {
-	// releaseIdentifier := GetReleaseIdentifierFromReleaseName(releaseName)
-	// fmt.Println("..............TearDownAWS............")
-
-	// First, get the name of the current EKS cluster.
-	// clusterName, err := GetCurrentEKSClusterName()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return err
-	// }
-
-	// Delete the S3 bucket associated with the release.
-	// bucketName := "zinc-observe-" + releaseIdentifier + "-" + clusterName + "-" + releaseName
 	err := DeleteS3Bucket(setupData.BucketName)
 	if err != nil {
 		return err
 	}
-	fmt.Println("S3 bucket deleted: ", setupData.BucketName)
 
-	// Delete the IAM role and policy associated with the release.
-	// roleName := "zinc-observe-5080-" + releaseIdentifier + "-" + clusterName + "-" + releaseName
 	err = DeleteIAMRoleWithPolicies(setupData.IamRole)
 	if err != nil {
 		return err
