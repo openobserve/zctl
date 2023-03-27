@@ -76,9 +76,6 @@ func (h *Helm) DownloadChart() (*chart.Chart, error) {
 		}
 	}
 
-	// Print a log message for the chart being downloaded.
-	fmt.Printf("Downloading Chart: %s\n", chartPath)
-
 	// Get the appropriate getter for the repository URL scheme.
 	g, err := getters.ByScheme(u.Scheme)
 	if err != nil {

@@ -57,10 +57,6 @@ var installCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(installCmd)
 
-	K8s := "eks"
-	installCmd.Flags().StringVar(&K8s, "k8s", "eks", "k8s cluster type. eks, gke, plain")
-	installCmd.MarkFlagRequired("k8s")
-
 	namespace := ""
 	installCmd.Flags().StringVar(&namespace, "namespace", "", "namespace to install the helm chart1")
 

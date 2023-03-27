@@ -50,13 +50,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&Name, "name", "", "name of the installation for underlying helm chart")
 	rootCmd.MarkPersistentFlagRequired("name")
 
-	// Namespace := ""
-	// rootCmd.PersistentFlags().StringVar(&Namespace, "namespace", "", "name of the namespace for installing the release")
-	// rootCmd.MarkPersistentFlagRequired("namespace")
+	k8s := ""
+	rootCmd.PersistentFlags().StringVar(&k8s, "k8s", "", "k8s cluster type. eks, gke, plain")
+	rootCmd.MarkPersistentFlagRequired("k8s")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.

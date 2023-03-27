@@ -50,7 +50,7 @@ func Teardown(releaseName, namespace, region string) error {
 	cm, err := ReadConfigMap(cmName, namespace)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
-		fmt.Println("error: ", err)
+		fmt.Println("error reading configmap for release: "+releaseName+" in namespace: "+namespace+" : ", err)
 		return err
 	}
 

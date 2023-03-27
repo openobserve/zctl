@@ -56,15 +56,12 @@ setup_data: {
 "iam_role: "zinc-observe-5080-dev2-zo1"
 }
 
-
 # What is working today
 
 ## Install on EKS
 
-> zctl install --k8s=eks --name=zo1 --namespace=zo1
+> zctl install --k8s=eks --name=zo1
 
+## Uninstall a release in EKS
 
-## Delete a release in EKS
-
-> zctl delete --name=zo1 --namespace=zo1
-
+> zctl uninstall --k8s=eks --name=zo1
