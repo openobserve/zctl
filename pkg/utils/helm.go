@@ -133,7 +133,7 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 	// Update the Helm chart values with the AWS bucket name and role ARN.
 	data.Config.ZOS3BUCKETNAME = bucket
 	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
-	data.Image.Repository = "public.ecr.aws/zinclabs/zincobserve-dev"
+	data.Image.Repository = "public.ecr.aws/zinclabs/zincobserve"
 	data.Image.Tag = "v0.3.1"
 
 	yamlData, err := yaml.Marshal(&data)

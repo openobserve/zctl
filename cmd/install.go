@@ -41,6 +41,13 @@ var installCmd = &cobra.Command{
 			}
 
 			utils.CreateConfigMap(setupData, namespace)
+		} else {
+			setupData, err := utils.Setup(releaseIdentifer, name, namespace)
+			if err != nil {
+				fmt.Println("Error: ", err)
+			}
+
+			utils.CreateConfigMap(setupData, namespace)
 		}
 
 	},
