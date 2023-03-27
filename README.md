@@ -61,7 +61,7 @@ setup_data: {
 
 ## Install on EKS
 
-> zctl install --k8s=eks --name=zo1
+> zctl install --k8s=eks --name=zo1 --namespace=zo1
 
 
 ## Delete a release in EKS
