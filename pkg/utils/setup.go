@@ -6,26 +6,27 @@ import (
 
 // Setup function sets up AWS and Helm resources needed for the application.
 // It takes the releaseName and namespace as input and returns an error if one occurs.
-func Setup(installIdentifer, releaseName string, namespace string, region string) (SetupData, error) {
+func Setup(inputData SetupInputData) (SetupData, error) {
+	// func Setup(installIdentifer, releaseName string, namespace string, region string) (SetupData, error) {
 
 	setupData := SetupData{}
 
 	// check if setup already exists
-	config, err := ReadConfigMap("zincobserve-setup", namespace)
+	config, err := ReadConfigMap("zincobserve-setup", inputData.Namespace)
 	if err == nil {
 		fmt.Println("Setup already exists")
 		fmt.Println(config)
 		return setupData, err
 	}
 
-	bucket, role, err := SetupAWS(installIdentifer, releaseName, region)
+	bucket, role, err := SetupAWS(inputData.Identifier, inputData.ReleaseName, inputData.Region)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)
 		return setupData, err
 	}
 
-	err = SetupHelm(releaseName, namespace, bucket, role)
+	err = SetupHelm(inputData.ReleaseName, inputData.Namespace, bucket, role)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up Helm resources.
 		fmt.Println("error: ", err)
@@ -33,8 +34,8 @@ func Setup(installIdentifer, releaseName string, namespace string, region string
 	}
 
 	setupData = SetupData{
-		Identifier:  installIdentifer,
-		ReleaseName: releaseName,
+		Identifier:  inputData.Identifier,
+		ReleaseName: inputData.ReleaseName,
 		BucketName:  bucket,
 		IamRole:     role,
 	}

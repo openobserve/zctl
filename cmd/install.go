@@ -22,9 +22,7 @@ var installCmd = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name := cmd.Flags().Lookup("name").Value.String()
-
 		namespace := cmd.Flags().Lookup("namespace").Value.String()
-
 		region := cmd.Flags().Lookup("region").Value.String()
 		if region == "" {
 			region, _ = utils.GetDefaultAwsRegion()
@@ -33,17 +31,25 @@ var installCmd = &cobra.Command{
 		// Let's do the setup
 		releaseIdentifer := utils.GenerateReleaseIdentifier()
 
+		inputData := utils.SetupInputData{
+			Identifier:  releaseIdentifer,
+			ReleaseName: name,
+			Namespace:   namespace,
+			Region:      region,
+		}
+
 		if namespace == "" {
 			namespace, _ := utils.GetCurrentNamespace()
+			inputData.Namespace = namespace
 
-			setupData, err := utils.Setup(releaseIdentifer, name, namespace, region)
+			setupData, err := utils.Setup(inputData)
 			if err != nil {
 				fmt.Println("Error: ", err)
 			}
 
 			utils.CreateConfigMap(setupData, namespace)
 		} else {
-			setupData, err := utils.Setup(releaseIdentifer, name, namespace, region)
+			setupData, err := utils.Setup(inputData)
 			if err != nil {
 				fmt.Println("Error: ", err)
 			}
