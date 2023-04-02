@@ -14,7 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateConfigMap(sData SetupData, namespace string) error {
+func CreateConfigMap(sData SetupData) error {
 	name := "zincobserve-setup"
 
 	// var data = make(map[string]string)
@@ -50,13 +50,13 @@ func CreateConfigMap(sData SetupData, namespace string) error {
 	cm := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: namespace,
+			Namespace: sData.Namespace,
 		},
 		Data: data,
 	}
 
 	// create the ConfigMap
-	_, err = clientset.CoreV1().ConfigMaps(namespace).Create(context.Background(), cm, metav1.CreateOptions{})
+	_, err = clientset.CoreV1().ConfigMaps(sData.Namespace).Create(context.Background(), cm, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,7 @@ import (
 
 // Setup function sets up AWS and Helm resources needed for the application.
 // It takes the releaseName and namespace as input and returns an error if one occurs.
-func Setup(inputData SetupInputData) (SetupData, error) {
+func Setup(inputData SetupData) (SetupData, error) {
 	// func Setup(installIdentifer, releaseName string, namespace string, region string) (SetupData, error) {
 
 	setupData := SetupData{}

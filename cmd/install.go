@@ -31,7 +31,7 @@ var installCmd = &cobra.Command{
 		// Let's do the setup
 		releaseIdentifer := utils.GenerateReleaseIdentifier()
 
-		inputData := utils.SetupInputData{
+		inputData := utils.SetupData{
 			Identifier:  releaseIdentifer,
 			ReleaseName: name,
 			Namespace:   namespace,
@@ -47,14 +47,16 @@ var installCmd = &cobra.Command{
 				fmt.Println("Error: ", err)
 			}
 
-			utils.CreateConfigMap(setupData, namespace)
+			setupData.Namespace = namespace
+
+			utils.CreateConfigMap(setupData)
 		} else {
 			setupData, err := utils.Setup(inputData)
 			if err != nil {
 				fmt.Println("Error: ", err)
 			}
 
-			utils.CreateConfigMap(setupData, namespace)
+			utils.CreateConfigMap(setupData)
 		}
 
 	},
