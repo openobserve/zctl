@@ -290,3 +290,10 @@ type SetupOutputData struct {
 	S3AccessKey string `json:"s3_access_key"`
 	S3SecretKey string `json:"s3_secret_key"`
 }
+
+type SetupData struct {
+	Identifier  string `json:"identifier"`   // unique identifier generated randomly to avoid conflicts
+	BucketName  string `json:"bucket_name"`  // s3 bucket name
+	ReleaseName string `json:"release_name"` // helm release name
+	IamRole     string `json:"iam_role"`     // role name
+}
