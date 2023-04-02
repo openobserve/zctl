@@ -7,7 +7,6 @@ import (
 // Setup function sets up AWS and Helm resources needed for the application.
 // It takes the releaseName and namespace as input and returns an error if one occurs.
 func Setup(inputData SetupData) (SetupData, error) {
-	// func Setup(installIdentifer, releaseName string, namespace string, region string) (SetupData, error) {
 
 	setupData := SetupData{}
 
@@ -19,7 +18,7 @@ func Setup(inputData SetupData) (SetupData, error) {
 		return setupData, err
 	}
 
-	bucket, role, err := SetupAWS(inputData)
+	bucket, role, clusterName, err := SetupAWS(inputData)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)
@@ -28,6 +27,7 @@ func Setup(inputData SetupData) (SetupData, error) {
 
 	inputData.BucketName = bucket
 	inputData.IamRole = role
+	inputData.ClusterName = clusterName
 
 	err = SetupHelm(inputData)
 	if err != nil {
@@ -41,6 +41,9 @@ func Setup(inputData SetupData) (SetupData, error) {
 		ReleaseName: inputData.ReleaseName,
 		BucketName:  bucket,
 		IamRole:     role,
+		K8s:         inputData.K8s,
+		Region:      inputData.Region,
+		ClusterName: clusterName,
 	}
 
 	return setupData, nil

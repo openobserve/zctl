@@ -23,6 +23,7 @@ var installCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		name := cmd.Flags().Lookup("name").Value.String()
 		namespace := cmd.Flags().Lookup("namespace").Value.String()
+		k8s := cmd.Flags().Lookup("k8s").Value.String()
 		region := cmd.Flags().Lookup("region").Value.String()
 		if region == "" {
 			region, _ = utils.GetDefaultAwsRegion()
@@ -36,6 +37,7 @@ var installCmd = &cobra.Command{
 			ReleaseName: name,
 			Namespace:   namespace,
 			Region:      region,
+			K8s:         k8s,
 		}
 
 		if namespace == "" {

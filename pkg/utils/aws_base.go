@@ -9,8 +9,9 @@ import (
 )
 
 // SetupAWSBase creates an S3 bucket, IAM role and inline policy for the role. It returns the ARN of the role.
-func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (string, string, error) {
-	exists, err := HasOIDCProvider(clusterName, region)
+// func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (string, string, error) {
+func SetupAWSBase(setupData SetupData) (string, string, error) {
+	exists, err := HasOIDCProvider(setupData.ClusterName, setupData.Region)
 	if err != nil {
 		fmt.Println("error: ", err)
 		return "", "", err
@@ -19,7 +20,7 @@ func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (st
 	clusterDetails := &types.Cluster{}
 	if exists {
 		// Get EKS cluster details
-		clusterDetails, err = GetEKSClusterDetails(clusterName)
+		clusterDetails, err = GetEKSClusterDetails(setupData.ClusterName)
 		if err != nil {
 			return "", "", err
 		}
@@ -34,15 +35,15 @@ func SetupAWSBase(releaseIdentifer, clusterName, releaseName, region string) (st
 	}
 
 	// create an s3 bucket
-	bucketName := "zinc-observe-" + releaseIdentifer + "-" + clusterName + "-" + releaseName
-	err = CreateS3Bucket(bucketName, region)
+	bucketName := "zinc-observe-" + setupData.Identifier + "-" + setupData.ClusterName + "-" + setupData.ReleaseName
+	err = CreateS3Bucket(bucketName, setupData.Region)
 	if err != nil {
 		return "", "", err
 	}
 
 	// create an IAM role
-	roleName := "zinc-observe-" + releaseIdentifer + "-" + clusterName + "-" + releaseName
-	_, err = CreateIAMRole(awsAccountId, region, issuerId, roleName, "zo-s3", clusterName, releaseName, bucketName)
+	roleName := "zinc-observe-" + setupData.Identifier + "-" + setupData.ClusterName + "-" + setupData.ReleaseName
+	_, err = CreateIAMRole(awsAccountId, setupData.Region, issuerId, roleName, "zo-s3", setupData.ClusterName, setupData.ReleaseName, bucketName)
 	if err != nil {
 		return "", "", err
 	}
