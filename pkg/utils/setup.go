@@ -19,14 +19,17 @@ func Setup(inputData SetupData) (SetupData, error) {
 		return setupData, err
 	}
 
-	bucket, role, err := SetupAWS(inputData.Identifier, inputData.ReleaseName, inputData.Region)
+	bucket, role, err := SetupAWS(inputData)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up AWS resources.
 		fmt.Println("error: ", err)
 		return setupData, err
 	}
 
-	err = SetupHelm(inputData.ReleaseName, inputData.Namespace, bucket, role)
+	inputData.BucketName = bucket
+	inputData.IamRole = role
+
+	err = SetupHelm(inputData)
 	if err != nil {
 		// Print an error message and terminate the program if an error occurs while setting up Helm resources.
 		fmt.Println("error: ", err)

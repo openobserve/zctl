@@ -12,14 +12,15 @@ import (
 // If an error occurs, it returns an empty string for both values and the error itself.
 // It requires the name of the release, the namespace to deploy to, the name of the S3 bucket, and the IAM role ARN.
 // If namespace is an empty string, it will default to "default". If namespace does not exist, it will be created.
-func SetupHelm(releaseName, namespace, bucket, role string) error {
+// func SetupHelm(releaseName, namespace, bucket, role string) error {
+func SetupHelm(setupData SetupData) error {
 	// arn:aws:iam::12345353456:role/zo-s3-eks
 	accountId, err := GetAWSAccountID()
 	if err != nil {
 		fmt.Println("error: ", err)
 		return err
 	}
-	roleArn := "arn:aws:iam::" + accountId + ":role/" + role
+	roleArn := "arn:aws:iam::" + accountId + ":role/" + setupData.IamRole
 
 	// Retrieve the URL of the Kubernetes cluster currently in use.
 	clusterURL, err := GetCurrentKubeContextAPIEndpoint()
@@ -42,8 +43,8 @@ func SetupHelm(releaseName, namespace, bucket, role string) error {
 		AppVersion:    "v0.3.1",
 		ChartName:     "zincobserve",
 		ChartVersion:  "0.3.1",
-		Namespace:     namespace,
-		ReleaseName:   releaseName,
+		Namespace:     setupData.Namespace,
+		ReleaseName:   setupData.ReleaseName,
 		RepositoryURL: "https://charts.zinc.dev",
 	}
 
@@ -55,7 +56,7 @@ func SetupHelm(releaseName, namespace, bucket, role string) error {
 		return err
 	}
 
-	chart.Values, err = setUpChartValues(chart.Values, bucket, roleArn)
+	chart.Values, err = setUpChartValues(chart.Values, setupData.BucketName, roleArn)
 	if err != nil {
 		// Print an error message if an error occurs while setting up the chart values.
 		fmt.Println("error setting up chart values: ", err)
