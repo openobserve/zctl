@@ -24,20 +24,28 @@ var installCmd = &cobra.Command{
 		name := cmd.Flags().Lookup("name").Value.String()
 		namespace := cmd.Flags().Lookup("namespace").Value.String()
 		k8s := cmd.Flags().Lookup("k8s").Value.String()
+
 		region := cmd.Flags().Lookup("region").Value.String()
 		if region == "" {
 			region, _ = utils.GetDefaultAwsRegion()
+		}
+
+		gcpProjectId := cmd.Flags().Lookup("gcp_project_id").Value.String()
+		if k8s == "gke" && gcpProjectId == "" {
+			fmt.Println("Error: You need to provide the --gcp_project_id if using GKE")
+			return
 		}
 
 		// Let's do the setup
 		releaseIdentifer := utils.GenerateReleaseIdentifier()
 
 		inputData := utils.SetupData{
-			Identifier:  releaseIdentifer,
-			ReleaseName: name,
-			Namespace:   namespace,
-			Region:      region,
-			K8s:         k8s,
+			Identifier:   releaseIdentifer,
+			ReleaseName:  name,
+			Namespace:    namespace,
+			Region:       region,
+			K8s:          k8s,
+			GCPProjectId: gcpProjectId,
 		}
 
 		if namespace == "" {
@@ -47,6 +55,7 @@ var installCmd = &cobra.Command{
 			setupData, err := utils.Setup(inputData)
 			if err != nil {
 				fmt.Println("Error: ", err)
+				panic(err)
 			}
 
 			setupData.Namespace = namespace
@@ -56,6 +65,7 @@ var installCmd = &cobra.Command{
 			setupData, err := utils.Setup(inputData)
 			if err != nil {
 				fmt.Println("Error: ", err)
+				panic(err)
 			}
 
 			utils.CreateConfigMap(setupData)
@@ -72,5 +82,8 @@ func init() {
 
 	region := ""
 	installCmd.Flags().StringVar(&region, "region", "", "region to install the installation in.")
+
+	gcpProjectId := ""
+	installCmd.Flags().StringVar(&gcpProjectId, "gcp_project_id", "", "GCP Project ID to install the installation in.")
 
 }

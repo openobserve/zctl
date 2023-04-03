@@ -138,6 +138,7 @@ type Config struct {
 	ZOS3SERVERURL                   string `yaml:"ZO_S3_SERVER_URL"`
 	ZOS3REGIONNAME                  string `yaml:"ZO_S3_REGION_NAME"`
 	ZOS3BUCKETNAME                  string `yaml:"ZO_S3_BUCKET_NAME"`
+	ZOS3PROVIDER                    string `yaml:"ZO_S3_PROVIDER"`
 	ZODATALIFECYCLE                 string `yaml:"ZO_DATA_LIFECYCLE"`
 }
 
@@ -268,15 +269,16 @@ type Statement struct {
 }
 
 type SetupData struct {
-	Identifier   string `json:"identifier"`   // unique identifier generated randomly to avoid conflicts
-	BucketName   string `json:"bucket_name"`  // s3 bucket name
-	ReleaseName  string `json:"release_name"` // helm release name
-	IamRole      string `json:"iam_role"`     // role name
-	K8s          string `json:"k8s"`          // k8s cluster name eks, gke, plain
-	S3AccessKey  string `json:"s3_access_key"`
-	S3SecretKey  string `json:"s3_secret_key"`
-	Namespace    string `json:"namespace"`
-	Region       string `json:"region"`
-	GCPProjectId string `json:"gcp_project_id"`
-	ClusterName  string `json:"cluster_name"`
+	Identifier     string `json:"identifier"`   // unique identifier generated randomly to avoid conflicts
+	BucketName     string `json:"bucket_name"`  // s3 bucket name
+	ReleaseName    string `json:"release_name"` // helm release name
+	IamRole        string `json:"iam_role"`     // role name
+	K8s            string `json:"k8s"`          // k8s cluster name eks, gke, plain
+	S3AccessKey    string `json:"s3_access_key"`
+	S3SecretKey    string `json:"s3_secret_key"`
+	Namespace      string `json:"namespace"`
+	Region         string `json:"region"`
+	GCPProjectId   string `json:"gcp_project_id"`
+	ClusterName    string `json:"cluster_name"`
+	ServiceAccount string `json:"service_account"`
 }

@@ -65,3 +65,35 @@ setup_data: {
 ## Uninstall a release in EKS
 
 > zctl uninstall --k8s=eks --name=zo1
+
+
+# AWS
+
+## Install
+> zctl install --k8s=eks --name=zo1  
+
+## Uninstall
+
+> zctl uninstall --k8s=eks --name=zo1
+
+# GCP
+
+## Install
+
+1. Get project ID
+
+> gcloud auth application-default login 
+> gcloud config get-value project
+
+> zctl install --k8s=gke --name=zo1 --namespace=zo1 --gcp_project_id=zinc1-342016
+
+This will create:
+
+1. A GCS bucket
+1. An IAM service account
+1. Grant IAM service account permissions to the GCS bucket
+1. Create HMAC keys (S3 access key and secret) fir the service account
+
+
+
+

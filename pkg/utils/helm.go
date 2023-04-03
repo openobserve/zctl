@@ -15,12 +15,6 @@ import (
 // func SetupHelm(releaseName, namespace, bucket, role string) error {
 func SetupHelm(setupData SetupData) error {
 	// arn:aws:iam::12345353456:role/zo-s3-eks
-	accountId, err := GetAWSAccountID()
-	if err != nil {
-		fmt.Println("error: ", err)
-		return err
-	}
-	roleArn := "arn:aws:iam::" + accountId + ":role/" + setupData.IamRole
 
 	// Retrieve the URL of the Kubernetes cluster currently in use.
 	clusterURL, err := GetCurrentKubeContextAPIEndpoint()
@@ -56,7 +50,7 @@ func SetupHelm(setupData SetupData) error {
 		return err
 	}
 
-	chart.Values, err = setUpChartValues(chart.Values, setupData.BucketName, roleArn)
+	chart.Values, err = setUpChartValues(chart.Values, setupData)
 	if err != nil {
 		// Print an error message if an error occurs while setting up the chart values.
 		fmt.Println("error setting up chart values: ", err)
@@ -91,7 +85,7 @@ func TearDownHelm(releaseName, namespace string) {
 
 }
 
-func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn string) (map[string]interface{}, error) {
+func setUpChartValues(baseValuesMap map[string]interface{}, setupData SetupData) (map[string]interface{}, error) {
 	// Marshal the values of the Helm chart to JSON format.
 	jsonData, err := json.Marshal(baseValuesMap)
 	if err != nil {
@@ -111,11 +105,23 @@ func setUpChartValues(baseValuesMap map[string]interface{}, bucket, roleArn stri
 		return nil, err
 	}
 
-	// Update the Helm chart values with the AWS bucket name and role ARN.
-	data.Config.ZOS3BUCKETNAME = bucket
-	data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = roleArn
+	data.Config.ZOS3BUCKETNAME = setupData.BucketName
 	data.Image.Repository = "public.ecr.aws/zinclabs/zincobserve"
-	data.Image.Tag = "v0.3.1"
+	data.Image.Tag = "v0.3.2"
+
+	if setupData.K8s == "eks" {
+		data.ServiceAccount.Annotations["eks.amazonaws.com/role-arn"] = setupData.IamRole
+	} else if setupData.K8s == "gke" {
+		data.Auth.ZOS3ACCESSKEY = setupData.S3AccessKey
+		data.Auth.ZOS3SECRETKEY = setupData.S3SecretKey
+		data.Config.ZOS3SERVERURL = "https://storage.googleapis.com"
+		data.Config.ZOS3PROVIDER = "gcs"
+		data.Config.ZOS3REGIONNAME = "us-east-1"
+	} else {
+		return nil, fmt.Errorf("invalid k8s provider")
+	}
+
+	// Update the Helm chart values with the AWS bucket name and role ARN.
 
 	// yamlData, err := yaml.Marshal(&data)
 	// if err != nil {
