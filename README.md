@@ -97,3 +97,7 @@ This will create:
 ## Uminstall
 
 > zctl uninstall --k8s=gke --name=zo1
+
+# Plain k8s install
+
+> zctl install --k8s=plain --name=zo1 --storage_provider=minio --install_minio=true --s3_access_key=fbjhsdfjhbj --s3_secret_key=hdsfkjhsdkjhkjhb --s3_server_url="http://some-url" --s3_bucket_name="bucket"

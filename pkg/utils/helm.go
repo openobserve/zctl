@@ -117,8 +117,19 @@ func setUpChartValues(baseValuesMap map[string]interface{}, setupData SetupData)
 		data.Config.ZOS3SERVERURL = "https://storage.googleapis.com"
 		data.Config.ZOS3PROVIDER = "gcs"
 		data.Config.ZOS3REGIONNAME = "us-east-1"
+	} else if setupData.K8s == "plain" {
+		if setupData.InstallMinIO {
+			data.MinIO.Enabled = true
+		} else if !setupData.InstallMinIO {
+			data.MinIO.Enabled = false
+			data.Auth.ZOS3ACCESSKEY = setupData.S3AccessKey
+			data.Auth.ZOS3SECRETKEY = setupData.S3SecretKey
+			data.Config.ZOS3SERVERURL = setupData.S3ServerURL
+			data.Config.ZOS3BUCKETNAME = setupData.BucketName
+			data.Config.ZOS3REGIONNAME = "us-east-1"
+		}
 	} else {
-		return nil, fmt.Errorf("invalid k8s provider")
+		return nil, fmt.Errorf("invalid k8s provider. Valid values are: eks, gke, plain")
 	}
 
 	// Update the Helm chart values with the AWS bucket name and role ARN.

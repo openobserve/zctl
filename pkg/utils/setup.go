@@ -60,6 +60,8 @@ func Setup(setupData SetupData) (SetupData, error) {
 		setupData.ServiceAccount = gcpData.ServiceAccount
 		setupData.Region = "us-east-1" // Dummy region required by aws sdk
 
+	} else if setupData.K8s == "plain" { /////////////// Setup in plain k8s
+		fmt.Println("Plain k8s setup")
 	} else {
 		return setupData, errors.New("k8s type not supported")
 	}
@@ -98,7 +100,6 @@ func Teardown(releaseName, namespace, region string) error {
 	} else if cm.K8s == "gke" {
 		// DeleteGCSBucket(cm) // We do not want to delete the data in the bucket
 		DeleteGCPServiceAccount(cm)
-
 	}
 
 	TearDownHelm(releaseName, namespace)

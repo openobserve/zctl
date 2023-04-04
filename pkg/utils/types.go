@@ -269,16 +269,19 @@ type Statement struct {
 }
 
 type SetupData struct {
-	Identifier     string `json:"identifier"`   // unique identifier generated randomly to avoid conflicts
-	BucketName     string `json:"bucket_name"`  // s3 bucket name
-	ReleaseName    string `json:"release_name"` // helm release name
-	IamRole        string `json:"iam_role"`     // role name
-	K8s            string `json:"k8s"`          // k8s cluster name eks, gke, plain
-	S3AccessKey    string `json:"s3_access_key"`
-	S3SecretKey    string `json:"s3_secret_key"`
-	Namespace      string `json:"namespace"`
-	Region         string `json:"region"`
-	GCPProjectId   string `json:"gcp_project_id"`
-	ClusterName    string `json:"cluster_name"`
-	ServiceAccount string `json:"service_account"`
+	Identifier      string `json:"identifier"`   // unique identifier generated randomly to avoid conflicts
+	BucketName      string `json:"bucket_name"`  // s3 bucket name
+	ReleaseName     string `json:"release_name"` // helm release name
+	IamRole         string `json:"iam_role"`     // role name
+	K8s             string `json:"k8s"`          // k8s cluster name eks, gke, plain
+	S3AccessKey     string `json:"s3_access_key"`
+	S3SecretKey     string `json:"s3_secret_key"`
+	Namespace       string `json:"namespace"`
+	Region          string `json:"region"`
+	GCPProjectId    string `json:"gcp_project_id"`
+	ClusterName     string `json:"cluster_name"`
+	ServiceAccount  string `json:"service_account"`
+	InstallMinIO    bool   `json:"install_minio"`
+	StorageProvider string `json:"storage_provider"`
+	S3ServerURL     string `json:"s3_server_url"`
 }
