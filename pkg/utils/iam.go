@@ -30,7 +30,7 @@ func GetS3PolicyDocument(bucketName string) string {
 					]
 				}
 			]
-		}`, bucketName)
+		}`, bucketName, bucketName)
 
 	return policy
 }
