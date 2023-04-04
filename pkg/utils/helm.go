@@ -36,7 +36,7 @@ func SetupHelm(setupData SetupData) error {
 	h1 := Helm{
 		AppVersion:    "v0.3.1",
 		ChartName:     "zincobserve",
-		ChartVersion:  "0.3.1",
+		ChartVersion:  "0.3.3",
 		Namespace:     setupData.Namespace,
 		ReleaseName:   setupData.ReleaseName,
 		RepositoryURL: "https://charts.zinc.dev",

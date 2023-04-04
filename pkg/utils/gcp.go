@@ -48,6 +48,38 @@ func SetupGCP(setupData SetupData) (SetupData, error) {
 	return setupData, nil
 }
 
+// DeleteGCPServiceAccount deletes a service account
+func DeleteGCPServiceAccount(setupData SetupData) error {
+	ctx := context.Background()
+	client, err := admin.NewIamClient(ctx)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+	defer client.Close()
+
+	// Delete the service account.
+	if err := client.DeleteServiceAccount(ctx, &adminpb.DeleteServiceAccountRequest{
+		Name: fmt.Sprintf("projects/%s/serviceAccounts/%s", setupData.GCPProjectId, setupData.ServiceAccount),
+	}); err != nil {
+		log.Fatalf("Failed to delete service account: %v", err)
+	}
+
+	return nil
+}
+
+func DeleteGCSBucket(setupData SetupData) {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.Bucket(setupData.BucketName).Delete(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func GrantAllAccessToBucket(projectID, bucketName, serviceAccountEmail string) error {
 	{
 		ctx := context.Background()

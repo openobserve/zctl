@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"context"
 
@@ -124,8 +125,10 @@ func CreateIAMRole(accountId, region, issuerId, roleName, policyName, clusterNam
 
 // DeleteIAMRoleWithPolicies deletes an IAM role and all of its associated policies.
 // It returns an error if one occurs.
-func DeleteIAMRoleWithPolicies(roleName string) error {
+func DeleteIAMRoleWithPolicies(roleArn string) error {
 	fmt.Println("DeleteIAMRoleWithPolicies............")
+
+	roleName := strings.Split(roleArn, "/")[1] // Extract the role name from the ARN.
 
 	// Load the AWS configuration.
 	cfg, err := config.LoadDefaultConfig(context.Background())

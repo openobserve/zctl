@@ -55,12 +55,12 @@ func SetupAWSBase(setupData SetupData) (string, string, error) {
 // It deletes the S3 bucket and the IAM role and policy.
 // If an error occurs, it panics with the error message.
 func TearDownAWS(setupData SetupData, region string) error {
-	err := DeleteS3Bucket(setupData.BucketName, region)
-	if err != nil {
-		return err
-	}
+	// err := DeleteS3Bucket(setupData.BucketName, region) // We do not want to delete the bucket
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = DeleteIAMRoleWithPolicies(setupData.IamRole)
+	err := DeleteIAMRoleWithPolicies(setupData.IamRole)
 	if err != nil {
 		return err
 	}

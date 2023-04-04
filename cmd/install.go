@@ -48,7 +48,7 @@ var installCmd = &cobra.Command{
 			GCPProjectId: gcpProjectId,
 		}
 
-		if namespace == "" {
+		if namespace == "" { // if namespace is not provided, use the current namespace
 			namespace, _ := utils.GetCurrentNamespace()
 			inputData.Namespace = namespace
 
@@ -61,7 +61,7 @@ var installCmd = &cobra.Command{
 			setupData.Namespace = namespace
 
 			utils.CreateConfigMap(setupData)
-		} else {
+		} else { // if namespace is provided, use that namespace
 			setupData, err := utils.Setup(inputData)
 			if err != nil {
 				fmt.Println("Error: ", err)

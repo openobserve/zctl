@@ -67,12 +67,7 @@ func CreateConfigMap(sData SetupData) error {
 
 func ReadConfigMap(name string, namespace string) (SetupData, error) {
 
-	setupData := SetupData{
-		Identifier:  "",
-		BucketName:  "",
-		ReleaseName: "",
-		IamRole:     "",
-	}
+	setupData := SetupData{}
 	// Use the default kubeconfig file to create a Config object.
 	kubeconfig, err := clientcmd.LoadFromFile(clientcmd.RecommendedHomeFile)
 	if err != nil {
