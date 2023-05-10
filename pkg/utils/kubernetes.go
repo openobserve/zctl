@@ -97,8 +97,6 @@ func ReadConfigMap(name string, namespace string) (SetupData, error) {
 		return setupData, err
 	}
 
-	fmt.Println("ConfigMap read successfully")
-
 	return setupData, nil
 }
 

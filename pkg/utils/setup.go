@@ -10,10 +10,9 @@ import (
 func Setup(setupData SetupData) (SetupData, error) {
 
 	// check if setup already exists
-	config, err := ReadConfigMap("zincobserve-setup", setupData.Namespace)
+	_, err := ReadConfigMap("zincobserve-setup", setupData.Namespace)
 	if err == nil {
 		fmt.Println("Setup already exists")
-		fmt.Println(config)
 		return setupData, err
 	}
 

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ZincObserve
+metadata:
+  name: zo1
+  namespace: zo1 # Optional. Will be created if not specified or does not exist
+spec:
+  k8s: eks

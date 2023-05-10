@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/zinclabs/zctl/pkg/utils"
 )
 
@@ -42,9 +43,7 @@ Uninstalls a ZincObserve installation in the EKS cluster. The subtasks include:
 func init() {
 	rootCmd.AddCommand(uninstallCmd)
 
-	namespace := ""
-	uninstallCmd.Flags().StringVar(&namespace, "namespace", "", "namespace to install the helm chart")
-
-	region := ""
-	uninstallCmd.Flags().StringVar(&region, "region", "", "region to delete the installation from ")
+	// Bind viper values to the uninstall command flags
+	uninstallCmd.Flags().String("namespace", viper.GetString("namespace"), "namespace to install the helm chart")
+	uninstallCmd.Flags().String("region", viper.GetString("region"), "region to delete the installation from ")
 }

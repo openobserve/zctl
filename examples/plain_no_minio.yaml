@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ZincObserve
+metadata:
+  name: zo1
+  namespace: zo1 # Optional. Will be created if not specified or does not exist
+spec:
+  release_name: zo1
+  namespace: zo1
+  region: us-east-1
+  k8s: eks
+  gcp_project_id: gcpProjectId
+  storage_provider: storage_provider
+  install_minio: install_minio_bool
+  s3_server_url: s3_server_url
+  s3_bucket_name: s3_bucket_name
+  s3_access_key: s3_access_key
+  s3_secret_key: s3_secret_key
